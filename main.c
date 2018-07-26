@@ -29,9 +29,15 @@ void start();
 void goToXY();
 void drawBorder();
 void drawTitle();
-void admin_main();
-void cus_main();
+void admin_main(char *name);
+void cus_main(char *name);
 void progressBar();//进度条
+void admin_login();
+void cus_login();
+void admin_register();
+void cus_register();
+void admin_login_login();
+void cus_login_login();
 
 
 int i,j,k;//定义循环变量
@@ -40,7 +46,6 @@ int i,j,k;//定义循环变量
 int main()
 {
     start();
-
     return 0;
 }
 void start(){
@@ -77,12 +82,12 @@ void start(){
                     progressBar();
                     Sleep(100);
                     system("cls");
-                    admin_main();
+                    admin_login();
                     break;
 
                 case 1:
                     system("cls");
-                    cus_main();
+                    cus_login();
                     break;
             }
         }
@@ -139,8 +144,10 @@ void drawTitle(){
     goToXY(30,4);
     printf("欢迎使用MMS V1.0");
 }
-void admin_main(){
+void admin_main(char *name){
     drawBorder();
+    goToXY(60,3);
+    printf("欢迎您，%s!",name);
     goToXY(28,3);
     printf("****功能列表****");
     goToXY(29,5);
@@ -178,40 +185,107 @@ void admin_main(){
     goToXY(45,20);
     printf("|");
     goToXY(43,20);
-    char choice;
-    choice = getchar();
+    int choice;
+    scanf("%d",&choice);
     switch(choice){
-        case '1':
+        case 1:
             break;
-        case '2':
+        case 2:
             break;
-        case '3':
+        case 3:
             break;
-        case '4':
+        case 4:
             break;
-        case '5':
+        case 5:
             break;
-        case '6':
+        case 6:
             break;
-        case '7':
+        case 7:
             break;
-        case '8':
+        case 8:
             break;
-        case '9':
+        case 9:
             break;
-        case '10':
+        case 10:
             break;
-        case '11':
+        case 11:
             break;
-        case '12':
+        case 12:
             break;
-        case '13':
+        case 13:
             break;
     }
 
 }
-void cus_main(){
+void cus_main(char *name){
+    drawBorder();
+    goToXY(60,3);
+    printf("欢迎您，%s!",name);
+    goToXY(28,3);
+    printf("****功能列表****");
+    goToXY(29,5);
+    printf("1.选购商品");
+    goToXY(29,6);
+    printf("2.关键字查询");
+    goToXY(29,7);
+    printf("3.分类查询排序");
+    goToXY(29,8);
+    printf("4.反馈超市信息");
+    goToXY(29,9);
+    printf("5.商品购买记录");
+    goToXY(29,10);
+    printf("6.销量排序查询");
+    goToXY(29,11);
+    printf("7.更新基本信息");
+    goToXY(29,12);
+    printf("8.查询商品信息");
+    goToXY(29,13);
+    printf("9.更改界面颜色");
+    goToXY(29,14);
+    printf("10.商品信息导出");
+    goToXY(29,15);
+    printf("11.注销账户");
+    goToXY(29,16);
+    printf("12.退出");
 
+
+
+
+    goToXY(25,20);
+    printf("请输入您的选择：|");
+    goToXY(45,20);
+    printf("|");
+    goToXY(43,20);
+    int choice;
+    scanf("%d",&choice);
+    switch(choice){
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
+        case 9:
+            break;
+        case 10:
+            break;
+        case 11:
+            break;
+        case 12:
+            break;
+        case 13:
+            break;
+    }
 }
 void progressBar(){
     goToXY(26,19);
@@ -224,6 +298,277 @@ void progressBar(){
         printf("%d%%",i*5);
         Sleep(100);
     }
+}
+void admin_login(){
+    int state = 0;//0表示注册，1表示登陆
+    drawBorder();
+    drawTitle();
+    goToXY(24,9);
+    printf("请选择登录或注册：");
+    goToXY(26,12);
+    printf("①  ★  管理员注册");
+    goToXY(26,14);
+    printf("②      管理员登陆");
+
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == '8'){
+            goToXY(30,14);
+            printf("\b  ");
+            goToXY(30,12);
+            printf("★");
+            state = 0;
+        }
+        else if(choice == '2'){
+            goToXY(30,12);
+            printf("\b  ");
+            goToXY(30,14);
+            printf("★");
+            state = 1;
+        }else if(choice == '5'){
+            switch(state){
+                case 0:
+                    system("cls");
+                    drawBorder();
+                    admin_register();
+                    break;
+
+                case 1:
+                    system("cls");
+                    drawBorder();
+                    admin_login_login();
+                    break;
+            }
+        }
+    }
+    getchar();
+}
+void cus_login(){
+    int state = 0;//0表示注册，1表示登陆
+    drawBorder();
+    drawTitle();
+    goToXY(24,9);
+    printf("请选择登录或注册：");
+    goToXY(26,12);
+    printf("①  ★  顾客注册");
+    goToXY(26,14);
+    printf("②      顾客登陆");
+
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == '8'){
+            goToXY(30,14);
+            printf("\b  ");
+            goToXY(30,12);
+            printf("★");
+            state = 0;
+        }
+        else if(choice == '2'){
+            goToXY(30,12);
+            printf("\b  ");
+            goToXY(30,14);
+            printf("★");
+            state = 1;
+        }else if(choice == '5'){
+            switch(state){
+                case 0:
+                    system("cls");
+                    drawBorder();
+                    cus_register();
+                    break;
+
+                case 1:
+                    system("cls");
+                    drawBorder();
+                    cus_login_login();
+                    break;
+            }
+        }
+    }
+    getchar();
+}
+void admin_register(){
+    char name[20];
+    char sex[10];
+    char phone[20];
+    char mail[30];
+    char code[10];
+    char pass[20];
+    char pass_double[20];
 
 
+
+    goToXY(28,3);
+    printf("****管理员注册信息****");
+    goToXY(20,9);
+    printf("昵称：");
+    goToXY(20,10);
+    printf("性别：");
+    goToXY(20,11);
+    printf("邮箱：");
+    goToXY(20,12);
+    printf("手机号：");
+    goToXY(20,13);
+    printf("管理员注册码：");
+    goToXY(20,15);
+    printf("密码：");
+    goToXY(20,16);
+    printf("重复密码：");
+
+
+    goToXY(27,9);
+    gets(name);
+    goToXY(27,10);
+    gets(sex);
+    goToXY(27,11);
+    gets(mail);
+    goToXY(29,12);
+    gets(phone);
+    goToXY(35,13);
+    gets(code);
+    goToXY(27,15);
+    gets(pass);
+    goToXY(31,16);
+    gets(pass_double);
+
+    if((!strcmp(code,"cjhz"))&&(!strcmp(pass,pass_double))){
+        system("cls");
+        drawBorder();
+        goToXY(30,9);
+        printf("用户名：%s",name);
+        goToXY(25,11);
+        printf("管理员身份注册成功，按任意键继续！");
+        getch();
+        system("cls");
+        admin_login_login();
+
+    }else{
+        start();
+    }
+
+
+}
+void cus_register(){
+    char name[20];
+    char sex[10];
+    char phone[20];
+    char mail[30];
+    char pass[20];
+    char pass_double[20];
+
+
+
+    goToXY(28,3);
+    printf("****顾客用户注册信息****");
+    goToXY(20,9);
+    printf("昵称：");
+    goToXY(20,10);
+    printf("性别：");
+    goToXY(20,11);
+    printf("邮箱：");
+    goToXY(20,12);
+    printf("手机号：");
+    goToXY(20,15);
+    printf("密码：");
+    goToXY(20,16);
+    printf("重复密码：");
+
+
+    goToXY(27,9);
+    gets(name);
+    goToXY(27,10);
+    gets(sex);
+    goToXY(27,11);
+    gets(mail);
+    goToXY(29,12);
+    gets(phone);
+    goToXY(27,15);
+    gets(pass);
+    goToXY(31,16);
+    gets(pass_double);
+
+     if(!strcmp(pass,pass_double)){
+        system("cls");
+        drawBorder();
+        goToXY(30,9);
+        printf("用户名：%s",name);
+        goToXY(25,11);
+        printf("顾客身份注册成功，按任意键继续！");
+        getch();
+        system("cls");
+        admin_login_login();
+
+    }
+
+}
+
+void admin_login_login(){
+    char login_name[20];
+    char login_pass[20];
+
+    drawBorder();
+    goToXY(30,3);
+    printf("****管理员登陆****");
+    goToXY(25,8);
+    printf("昵称：");
+    goToXY(25,9);
+    printf("密码：");
+
+    goToXY(31,8);
+    gets(login_name);
+    goToXY(31,9);
+    gets(login_pass);
+
+    goToXY(23,19);
+    printf("系统正在验证您的登陆信息，请稍后！");
+    goToXY(19,17);
+    for(i = 0;i <= 20;i++){
+        goToXY(19+i*2,17);
+        printf("▌");
+        goToXY(69,17);
+        printf("%d%%",i*5);
+        Sleep(100);
+    }
+    system("cls");
+    if(1){
+        system("cls");
+        admin_main(login_name);
+
+    }
+
+}
+void cus_login_login(){
+    char login_name[20];
+    char login_pass[20];
+
+    drawBorder();
+    goToXY(30,3);
+    printf("****顾客登陆****");
+    goToXY(25,8);
+    printf("昵称：");
+    goToXY(25,9);
+    printf("密码：");
+
+    goToXY(31,8);
+    gets(login_name);
+    goToXY(31,9);
+    gets(login_pass);
+
+    goToXY(23,19);
+    printf("系统正在验证您的登陆信息，请稍后！");
+    goToXY(19,17);
+    for(i = 0;i <= 20;i++){
+        goToXY(19+i*2,17);
+        printf("▌");
+        goToXY(69,17);
+        printf("%d%%",i*5);
+        Sleep(100);
+    }
+    system("cls");
+    if(1){
+        system("cls");
+        cus_main(login_name);
+    }
 }
