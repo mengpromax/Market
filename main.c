@@ -31,6 +31,8 @@ void drawBorder();
 void drawTitle();
 void admin_main();
 void cus_main();
+void progressBar();//进度条
+
 
 int i,j,k;//定义循环变量
 
@@ -72,10 +74,14 @@ void start(){
         }else if(choice == '5'){
             switch(state){
                 case 0:
+                    progressBar();
+                    Sleep(100);
+                    system("cls");
                     admin_main();
                     break;
 
                 case 1:
+                    system("cls");
                     cus_main();
                     break;
             }
@@ -134,8 +140,90 @@ void drawTitle(){
     printf("欢迎使用MMS V1.0");
 }
 void admin_main(){
-    exit(0);
+    drawBorder();
+    goToXY(28,3);
+    printf("****功能列表****");
+    goToXY(29,5);
+    printf("1.添加商品信息");
+    goToXY(29,6);
+    printf("2.修改商品信息");
+    goToXY(29,7);
+    printf("3.分类查询排序");
+    goToXY(29,8);
+    printf("4.用户反馈信息");
+    goToXY(29,9);
+    printf("5.库存信息查询");
+    goToXY(29,10);
+    printf("6.销量信息查询");
+    goToXY(29,11);
+    printf("7.分页显示商品信息");
+    goToXY(29,12);
+    printf("8.更新基本信息");
+    goToXY(29,13);
+    printf("9.查询商品信息");
+    goToXY(29,14);
+    printf("10.更改界面颜色");
+    goToXY(29,15);
+    printf("11.商品信息到处");
+    goToXY(29,16);
+    printf("12.注销账户");
+    goToXY(29,17);
+    printf("13.退出");
+
+
+
+
+    goToXY(25,20);
+    printf("请输入您的选择：|");
+    goToXY(45,20);
+    printf("|");
+    goToXY(43,20);
+    char choice;
+    choice = getchar();
+    switch(choice){
+        case '1':
+            break;
+        case '2':
+            break;
+        case '3':
+            break;
+        case '4':
+            break;
+        case '5':
+            break;
+        case '6':
+            break;
+        case '7':
+            break;
+        case '8':
+            break;
+        case '9':
+            break;
+        case '10':
+            break;
+        case '11':
+            break;
+        case '12':
+            break;
+        case '13':
+            break;
+    }
+
 }
 void cus_main(){
+
+}
+void progressBar(){
+    goToXY(26,19);
+    printf("系统正在加载，请稍后！");
+    goToXY(19,17);
+    for(i = 0;i <= 20;i++){
+        goToXY(19+i*2,17);
+        printf("▌");
+        goToXY(69,17);
+        printf("%d%%",i*5);
+        Sleep(100);
+    }
+
 
 }
