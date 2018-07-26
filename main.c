@@ -29,6 +29,8 @@ void start();
 void goToXY();
 void drawBorder();
 void drawTitle();
+void admin_main();
+void cus_main();
 
 int i,j,k;//定义循环变量
 
@@ -40,6 +42,7 @@ int main()
     return 0;
 }
 void start(){
+    int state = 0;//保存用户的身份选择信息，0为管理员，1为顾客
     system("color f1");
     drawBorder();
     drawTitle();
@@ -50,7 +53,34 @@ void start(){
     goToXY(26,14);
     printf("②      顾客");
 
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == '8'){
+            goToXY(30,14);
+            printf("\b  ");
+            goToXY(30,12);
+            printf("★");
+            state = 0;
+        }
+        else if(choice == '2'){
+            goToXY(30,12);
+            printf("\b  ");
+            goToXY(30,14);
+            printf("★");
+            state = 1;
+        }else if(choice == '5'){
+            switch(state){
+                case 0:
+                    admin_main();
+                    break;
 
+                case 1:
+                    cus_main();
+                    break;
+            }
+        }
+    }
     getchar();
 }
 void goToXY(int x,int y){
@@ -102,4 +132,10 @@ void drawTitle(){
     }
     goToXY(30,4);
     printf("欢迎使用MMS V1.0");
+}
+void admin_main(){
+    exit(0);
+}
+void cus_main(){
+
 }
