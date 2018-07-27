@@ -78,7 +78,7 @@ void start(){
     while(TRUE){
         char choice;
         choice = getch();
-        if(choice == '8'){
+        if(choice == 72){
             goToXY(30,12+state*2);
             printf("\b  ");
             state -= 1;
@@ -88,7 +88,7 @@ void start(){
             goToXY(30,12+state*2);
             printf("бя");
         }
-        else if(choice == '2'){
+        else if(choice == 80){
             goToXY(30,12+state*2);
             printf("\b  ");
             state += 1;
@@ -97,7 +97,7 @@ void start(){
             }
             goToXY(30,12+state*2);
             printf("бя");
-        }else if(choice == '5'){
+        }else if(choice == '\r'){
             switch(state){
                 case 0:
                     progressBar();
@@ -341,7 +341,7 @@ void admin_login(){
     while(TRUE){
         char choice;
         choice = getch();
-        if(choice == '8'){
+        if(choice == 72){
             goToXY(30,12+state*2);
             printf("\b  ");
             state -= 1;
@@ -351,7 +351,7 @@ void admin_login(){
             goToXY(30,12+state*2);
             printf("бя");
         }
-        else if(choice == '2'){
+        else if(choice == 80){
 
             goToXY(30,12+state*2);
             printf("\b  ");
@@ -362,7 +362,7 @@ void admin_login(){
             goToXY(30,12+state*2);
             printf("бя");
 
-        }else if(choice == '5'){
+        }else if(choice == '\r'){
             switch(state){
                 case 0:
                     system("cls");
@@ -400,7 +400,7 @@ void cus_login(){
     while(TRUE){
         char choice;
         choice = getch();
-        if(choice == '8'){
+        if(choice == 72){
             goToXY(30,12+state*2);
             printf("\b  ");
             state -= 1;
@@ -410,7 +410,7 @@ void cus_login(){
             goToXY(30,12+state*2);
             printf("бя");
         }
-        else if(choice == '2'){
+        else if(choice == 80){
             goToXY(30,12+state*2);
             printf("\b  ");
             state += 1;
@@ -419,7 +419,7 @@ void cus_login(){
             }
             goToXY(30,12+state*2);
             printf("бя");
-        }else if(choice == '5'){
+        }else if(choice == '\r'){
             switch(state){
                 case 0:
                     system("cls");
