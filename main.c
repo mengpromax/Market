@@ -51,6 +51,7 @@ void admin_register();
 void cus_register();
 void admin_login_login();
 void cus_login_login();
+void hideCursor();
 
 
 int i,j,k;//定义循环变量
@@ -58,6 +59,7 @@ int i,j,k;//定义循环变量
 
 int main()
 {
+    hideCursor();
     start();
     return 0;
 }
@@ -679,4 +681,8 @@ void cus_login_login(){
         system("cls");
         admin_login();
     }
+}
+void hideCursor(){
+    CONSOLE_CURSOR_INFO cursor_info;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
 }
