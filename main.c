@@ -12,6 +12,10 @@
 #define LEN sizeof(struct commodity)
 #define FORMAT "%-15d%-15s%-15.1lf%-15.1lf%-15.1lf"
 #define DATA comm[i].num,comm[i].name,comm[i].price,comm[i].count,comm[i].total
+#define USER_1 "user_1.dat"
+#define USER_2 "user_2.dat"
+#define PRODUCT "product.dat"
+
 
 struct commidity{
     int num;
@@ -21,6 +25,15 @@ struct commidity{
     double total;
 } ;
 //结构体数组
+struct user{
+    char name[20];
+    char sex[10];
+    char phone[20];
+    char mail[30];
+    char pass[20];
+    char pass_double[20];
+};
+//保存用户的信息
 struct commidity comm[50];
 
 
@@ -59,23 +72,31 @@ void start(){
     printf("①  ★  超市管理员");
     goToXY(26,14);
     printf("②      顾客");
+    goToXY(26,16);
+    printf("③      退出系统");
 
     while(TRUE){
         char choice;
         choice = getch();
         if(choice == '8'){
-            goToXY(30,14);
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,12);
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 0;
         }
         else if(choice == '2'){
-            goToXY(30,12);
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,14);
+            state += 1;
+            if(state == 3){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 1;
         }else if(choice == '5'){
             switch(state){
                 case 0:
@@ -89,6 +110,9 @@ void start(){
                     system("cls");
                     cus_login();
                     break;
+                case 2:
+                    goToXY(0,24);
+                    exit(0);
             }
         }
     }
@@ -213,6 +237,8 @@ void admin_main(char *name){
         case 12:
             break;
         case 13:
+            system("cls");
+            start();
             break;
     }
 
@@ -282,19 +308,19 @@ void cus_main(char *name){
         case 11:
             break;
         case 12:
-            break;
-        case 13:
+            system("cls");
+            start();
             break;
     }
 }
 void progressBar(){
-    goToXY(26,19);
+    goToXY(26,21);
     printf("系统正在加载，请稍后！");
-    goToXY(19,17);
+    goToXY(19,19);
     for(i = 0;i <= 20;i++){
-        goToXY(19+i*2,17);
+        goToXY(19+i*2,19);
         printf("▌");
-        goToXY(69,17);
+        goToXY(69,19);
         printf("%d%%",i*5);
         Sleep(100);
     }
@@ -309,23 +335,33 @@ void admin_login(){
     printf("①  ★  管理员注册");
     goToXY(26,14);
     printf("②      管理员登陆");
+    goToXY(26,16);
+    printf("③      退出");
 
     while(TRUE){
         char choice;
         choice = getch();
         if(choice == '8'){
-            goToXY(30,14);
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,12);
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 0;
         }
         else if(choice == '2'){
-            goToXY(30,12);
+
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,14);
+            state += 1;
+            if(state == 3){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 1;
+
         }else if(choice == '5'){
             switch(state){
                 case 0:
@@ -333,11 +369,14 @@ void admin_login(){
                     drawBorder();
                     admin_register();
                     break;
-
                 case 1:
                     system("cls");
                     drawBorder();
                     admin_login_login();
+                    break;
+                case 2:
+                    system("cls");
+                    start();
                     break;
             }
         }
@@ -354,23 +393,32 @@ void cus_login(){
     printf("①  ★  顾客注册");
     goToXY(26,14);
     printf("②      顾客登陆");
+    goToXY(26,16);
+    printf("③      退出");
+
 
     while(TRUE){
         char choice;
         choice = getch();
         if(choice == '8'){
-            goToXY(30,14);
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,12);
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 0;
         }
         else if(choice == '2'){
-            goToXY(30,12);
+            goToXY(30,12+state*2);
             printf("\b  ");
-            goToXY(30,14);
+            state += 1;
+            if(state == 3){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
             printf("★");
-            state = 1;
         }else if(choice == '5'){
             switch(state){
                 case 0:
@@ -384,21 +432,19 @@ void cus_login(){
                     drawBorder();
                     cus_login_login();
                     break;
+                case 2:
+                    system("cls");
+                    start();
+                    break;
             }
         }
     }
     getchar();
 }
 void admin_register(){
-    char name[20];
-    char sex[10];
-    char phone[20];
-    char mail[30];
+
+    struct user admin = {"","","","","",""};
     char code[10];
-    char pass[20];
-    char pass_double[20];
-
-
 
     goToXY(28,3);
     printf("****管理员注册信息****");
@@ -419,46 +465,49 @@ void admin_register(){
 
 
     goToXY(27,9);
-    gets(name);
+    gets(admin.name);
     goToXY(27,10);
-    gets(sex);
+    gets(admin.sex);
     goToXY(27,11);
-    gets(mail);
+    gets(admin.mail);
     goToXY(29,12);
-    gets(phone);
+    gets(admin.phone);
     goToXY(35,13);
     gets(code);
     goToXY(27,15);
-    gets(pass);
+    gets(admin.pass);
     goToXY(31,16);
-    gets(pass_double);
+    gets(admin.pass_double);
 
-    if((!strcmp(code,"cjhz"))&&(!strcmp(pass,pass_double))){
+
+
+    if((!strcmp(code,"cjhz"))&&(!strcmp(admin.pass,admin.pass_double))){
+
+        FILE *file;
+        file = fopen(USER_1,"ab+");
+        fwrite(&admin,sizeof(struct user),1,file);
+        fclose(file);
+
+
         system("cls");
         drawBorder();
         goToXY(30,9);
-        printf("用户名：%s",name);
+        printf("用户名：%s",admin.name);
         goToXY(25,11);
         printf("管理员身份注册成功，按任意键继续！");
         getch();
         system("cls");
-        admin_login_login();
+        admin_login();
 
     }else{
+        system("cls");
         start();
     }
 
 
 }
 void cus_register(){
-    char name[20];
-    char sex[10];
-    char phone[20];
-    char mail[30];
-    char pass[20];
-    char pass_double[20];
-
-
+    struct user cus = {"","","","","",""};
 
     goToXY(28,3);
     printf("****顾客用户注册信息****");
@@ -477,28 +526,34 @@ void cus_register(){
 
 
     goToXY(27,9);
-    gets(name);
+    gets(cus.name);
     goToXY(27,10);
-    gets(sex);
+    gets(cus.sex);
     goToXY(27,11);
-    gets(mail);
+    gets(cus.mail);
     goToXY(29,12);
-    gets(phone);
+    gets(cus.phone);
     goToXY(27,15);
-    gets(pass);
+    gets(cus.pass);
     goToXY(31,16);
-    gets(pass_double);
+    gets(cus.pass_double);
 
-     if(!strcmp(pass,pass_double)){
+     if(!strcmp(cus.pass,cus.pass_double)){
+
+        FILE *file;
+        file = fopen(USER_2,"ab+");
+        fwrite(&cus,sizeof(struct user),1,file);
+        fclose(file);
+
         system("cls");
         drawBorder();
         goToXY(30,9);
-        printf("用户名：%s",name);
+        printf("用户名：%s",cus.name);
         goToXY(25,11);
         printf("顾客身份注册成功，按任意键继续！");
         getch();
         system("cls");
-        admin_login_login();
+        cus_login();
 
     }
 
@@ -523,6 +578,23 @@ void admin_login_login(){
 
     goToXY(23,19);
     printf("系统正在验证您的登陆信息，请稍后！");
+
+    //验证账户
+    int correct = 0;//验证状态
+    struct user vertify = {"","","","","",""};
+    FILE *file = fopen("user_1.dat","ab+");
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&vertify,sizeof(struct user),1,file);
+        if(result != 0){
+            if((!strcmp(vertify.name,login_name))&&(!strcmp(vertify.pass,login_pass))){
+                correct = 1;
+                break;
+            }
+        }
+    }
+    fclose(file);
+
     goToXY(19,17);
     for(i = 0;i <= 20;i++){
         goToXY(19+i*2,17);
@@ -532,10 +604,19 @@ void admin_login_login(){
         Sleep(100);
     }
     system("cls");
-    if(1){
+    if(correct == 1){
         system("cls");
         admin_main(login_name);
-
+    }else if(correct == 0){
+        system("cls");
+        drawBorder();
+        goToXY(30,9);
+        printf("用户名：%s",login_name);
+        goToXY(25,11);
+        printf("用户名或密码错误，按任意键继续！");
+        getch();
+        system("cls");
+        admin_login();
     }
 
 }
@@ -558,6 +639,23 @@ void cus_login_login(){
 
     goToXY(23,19);
     printf("系统正在验证您的登陆信息，请稍后！");
+
+    //验证账户
+    int correct = 0;//验证状态
+    struct user vertify = {"","","","","",""};
+    FILE *file = fopen("user_2.dat","ab+");
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&vertify,sizeof(struct user),1,file);
+        if(result != 0){
+            if((!strcmp(vertify.name,login_name))&&(!strcmp(vertify.pass,login_pass))){
+                correct = 1;
+                break;
+            }
+        }
+    }
+    fclose(file);
+
     goToXY(19,17);
     for(i = 0;i <= 20;i++){
         goToXY(19+i*2,17);
@@ -567,8 +665,18 @@ void cus_login_login(){
         Sleep(100);
     }
     system("cls");
-    if(1){
+    if(correct == 1){
         system("cls");
         cus_main(login_name);
+    }else if(correct == 0){
+        system("cls");
+        drawBorder();
+        goToXY(30,9);
+        printf("用户名：%s",login_name);
+        goToXY(25,11);
+        printf("用户名或密码错误，按任意键继续！");
+        getch();
+        system("cls");
+        admin_login();
     }
 }
