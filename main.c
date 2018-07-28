@@ -57,8 +57,8 @@ void admin_login_login();
 void cus_login_login();
 void hideCursor();
 void switch_admin(int choice,char *name);
-void switch_cus(int choice);
-void del_comm(int del_num);
+void switch_cus(int choice,char *name);
+void del_comm(char *name);
 
 int i,j,k;//定义循环变量
 int del_num;
@@ -213,9 +213,6 @@ void admin_main(char *name){
     goToXY(29,18);
     printf("14.退出");
 
-
-
-
     goToXY(25,20);
     printf("请输入您的选择：|");
     goToXY(45,20);
@@ -236,26 +233,7 @@ void switch_admin(int choice,char *name){
         case 3:
             break;
         case 4:
-            system("cls");
-            drawBorder();
-            goToXY(28,3);
-            printf("****删除商品信息****");
-            goToXY(24,10);
-            printf("请输入要删除的商品编号:");
-            scanf("%d",&del_num);
-            del_comm(del_num);
-            progressBar("正在删除商品，请稍后！");
-            system("cls");
-            drawBorder();
-            goToXY(30,9);
-            printf("商品编号：%d",del_num);
-            goToXY(25,11);
-            printf("商品删除成功，按任意键继续！");
-            getch();
-            system("cls");
-            admin_main(name);
-
-
+            del_comm(name);
             break;
         case 5:
             break;
@@ -322,9 +300,9 @@ void cus_main(char *name){
     goToXY(43,20);
     int choice;
     scanf("%d",&choice);
-    switch_cus(choice);
+    switch_cus(choice,name);
 }
-void switch_cus(int choice){
+void switch_cus(int choice,char *name){
 	switch(choice){
         case 1:
             break;
@@ -516,9 +494,39 @@ void admin_register(){
     goToXY(35,13);
     gets(code);
     goToXY(27,15);
-    gets(admin.pass);
+    i=0;
+    char pw;
+    pw=getch();
+    while(pw != 13){
+    	if(pw == 8){
+			if(i!=0){printf("%c %c",pw,pw);i--;}
+        }
+        else if(i==20&&pw!=8){}
+        else
+        {
+          	printf("*");
+           	admin.pass[i] = pw;
+          	i++;
+    	}
+      	pw = getch(); //继续输入字符ch
+    }
+    admin.pass[i]='\0';
     goToXY(31,16);
-    gets(admin.pass_double);
+    i=0;
+    pw=getch();
+    while(pw != 13){
+		if ( pw == 8){
+			if(i!=0) {printf("%c %c",pw,pw);i--;}
+        }
+        else if(i==20&&pw!=8) {}
+        else{
+          	printf("*");
+           	admin.pass_double[i] = pw;
+         	 i++;
+        }
+       	pw = getch(); //继续输入字符ch
+    }
+    admin.pass_double[i]='\0';
 
 
 
@@ -575,12 +583,39 @@ void cus_register(){
     goToXY(29,12);
     gets(cus.phone);
     goToXY(27,15);
-    gets(cus.pass);
+    i=0;
+    char pw;
+	pw=getch();
+    while ( pw != 13){
+      	if(pw == 8){
+			if(i!=0) {printf("%c %c",pw,pw);i--;}
+        }else if(i==20&&pw!=8) {}
+        else{
+    		printf("*");
+           	cus.pass[i] = pw;
+          	i++;
+        }
+       	pw = getch(); //继续输入字符ch
+    }
+    cus.pass[i]='\0';
     goToXY(31,16);
-    gets(cus.pass_double);
+    i=0;
+    pw=getch();
+    while( pw != 13) //输入字符ch不为Enter
+	{
+		if(pw == 8)  //输入字符ch为BackSpace
+        {if(i!=0) {printf("%c %c",pw,pw);i--;}}
+        else if(i==20&&pw!=8) {}
+        else{
+          	printf("*");
+           	cus.pass_double[i] = pw;
+          	i++;
+        }
+       	pw = getch(); //继续输入字符ch
+    }
+    cus.pass_double[i]='\0';
 
-     if(!strcmp(cus.pass,cus.pass_double)){
-
+    if(!strcmp(cus.pass,cus.pass_double)){
         FILE *file;
         file = fopen(USER_2,"ab+");
         fwrite(&cus,sizeof(struct user),1,file);
@@ -725,7 +760,14 @@ void hideCursor(){
     CONSOLE_CURSOR_INFO cursor_info;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
 }
-void del_comm(int del_num){
+void del_comm(char *name){
+    system("cls");
+    drawBorder();
+    goToXY(28,3);
+    printf("****删除商品信息****");
+    goToXY(24,10);
+    printf("请输入要删除的商品编号:");
+    scanf("%d",&del_num);
     FILE *file = fopen(PRODUCT,"ab+");
     FILE *file_copy = fopen("copy.dat","ab+");
     struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -741,5 +783,16 @@ void del_comm(int del_num){
     fclose(file);
     remove(PRODUCT);
     rename("copy.dat",PRODUCT);
+    progressBar("正在删除商品，请稍后！");
+    system("cls");
+    drawBorder();
+    goToXY(30,9);
+    printf("商品编号：%d",del_num);
+    goToXY(25,11);
+    printf("商品删除成功，按任意键继续！");
+    getch();
+    system("cls");
+    admin_main(name);
+
 
 }
