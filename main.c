@@ -18,6 +18,13 @@
 #define MES "mes.dat"
 
 
+struct message{
+    char *name;
+    char *content;
+    char *contract;
+    char *date;
+};
+
 struct commodity{
     int num;//商品编号
     char name[15];//商品名称
@@ -60,7 +67,7 @@ void switch_admin(int choice,char *name);
 void switch_cus(int choice,char *name);
 void del_comm(char *name);
 void color_change(char *name);
-
+void send_mes(char *name);
 
 
 int i,j,k;//定义循环变量
@@ -315,6 +322,7 @@ void switch_cus(int choice,char *name){
         case 3:
             break;
         case 4:
+            send_mes(name);
             break;
         case 5:
             break;
@@ -638,6 +646,9 @@ void cus_register(){
         system("cls");
         cus_login();
 
+    }else{
+        system("cls");
+        start();
     }
 
 }
@@ -712,8 +723,7 @@ void cus_login_login(){
     goToXY(31,9);
     gets(login_pass);
 
-    goToXY(23,19);
-    printf("系统正在验证您的登陆信息，请稍后！");
+
 
     //验证账户
     int correct = 0;//验证状态
@@ -731,14 +741,7 @@ void cus_login_login(){
     }
     fclose(file);
 
-    goToXY(19,17);
-    for(i = 0;i <= 20;i++){
-        goToXY(19+i*2,17);
-        printf("▌");
-        goToXY(69,17);
-        printf("%d%%",i*5);
-        Sleep(100);
-    }
+    progressBar("系统正在验证您的登录信息，请稍候！");
     system("cls");
     if(correct == 1){
         system("cls");
@@ -752,7 +755,7 @@ void cus_login_login(){
         printf("用户名或密码错误，按任意键继续！");
         getch();
         system("cls");
-        admin_login();
+        cus_login();
     }
 }
 void hideCursor(){
@@ -800,7 +803,7 @@ void color_change(char *name){
     goToXY(28,3);
     printf("****更改界面颜色****");
     goToXY(26,8);
-    printf("①  ★  白底黑字");
+    printf("①  ★  白底黑字(该系统默认主题)");
     goToXY(26,10);
     printf("②      红底蓝字");
     goToXY(26,12);
@@ -810,7 +813,7 @@ void color_change(char *name){
     goToXY(26,16);
     printf("⑤      黄底紫字");
     goToXY(26,18);
-    printf("⑥      系统默认控制台颜色");
+    printf("⑥      绿底白字");
     goToXY(26,20);
     printf("⑦      退出并保存颜色设置");
     while(TRUE){
@@ -863,4 +866,30 @@ void color_change(char *name){
         }
     }
     getchar();
+}
+void send_mes(char *name){
+    char content[200],contract[30];
+    struct message mes = {"","","",""};
+    system("cls");
+    drawBorder();
+    goToXY(23,3);
+    printf("****反馈信息页面,期待着您的声音！****");
+    goToXY(15,8);
+    printf("请输入反馈信息：");
+    goToXY(10,10);
+    printf("请输入您的联系方式，以便我们与您取得联系：");
+    goToXY(31,8);
+    scanf("%s",content);
+    goToXY(52,10);
+    scanf("%s",contract);
+    FILE *file = fopen(MES,"ab+");
+    fwrite(&mes,sizeof(struct message),1,file);
+    fclose(file);
+    goToXY(22,18);
+    printf("已经收到您的来信，请您期待更好的我们！");
+    goToXY(29,19);
+    printf("按任意键返回主界面！");
+    getch();
+    system("cls");
+    cus_main(name);
 }
