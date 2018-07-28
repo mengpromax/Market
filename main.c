@@ -15,14 +15,19 @@
 #define USER_1 "user_1.dat"
 #define USER_2 "user_2.dat"
 #define PRODUCT "product.dat"
+#define MES "mes.dat"
 
 
-struct commidity{
-    int num;
-    char name[15];
-    double price;
-    double count;
-    double total;
+struct commodity{
+    int num;//商品编号
+    char name[15];//商品名称
+    double in_price;//进价
+    double out_price;//售价
+    char desc[100];//商品描述
+    double count;//库存量
+    char sort[30];//类别
+    int sold;//销售量
+    char provider[50];//生产商
 } ;
 //结构体数组
 struct user{
@@ -34,7 +39,6 @@ struct user{
     char pass_double[20];
 };
 //保存用户的信息
-struct commidity comm[50];
 
 
 
@@ -44,7 +48,7 @@ void drawBorder();
 void drawTitle();
 void admin_main(char *name);
 void cus_main(char *name);
-void progressBar();//进度条
+void progressBar(char *text);//进度条
 void admin_login();
 void cus_login();
 void admin_register();
@@ -52,10 +56,12 @@ void cus_register();
 void admin_login_login();
 void cus_login_login();
 void hideCursor();
-
+void switch_admin(int choice,char *name);
+void switch_cus(int choice);
+void del_comm(int del_num);
 
 int i,j,k;//定义循环变量
-
+int del_num;
 
 int main()
 {
@@ -102,13 +108,15 @@ void start(){
         }else if(choice == '\r'){
             switch(state){
                 case 0:
-                    progressBar();
+                    progressBar("系统正在加载，请稍候！");
                     Sleep(100);
                     system("cls");
                     admin_login();
                     break;
 
                 case 1:
+                    progressBar("系统正在加载，请稍候！");
+                    Sleep(100);
                     system("cls");
                     cus_login();
                     break;
@@ -183,25 +191,27 @@ void admin_main(char *name){
     goToXY(29,7);
     printf("3.分类查询排序");
     goToXY(29,8);
-    printf("4.用户反馈信息");
+    printf("4.删除商品信息");
     goToXY(29,9);
-    printf("5.库存信息查询");
+    printf("5.用户反馈信息");
     goToXY(29,10);
-    printf("6.销量信息查询");
+    printf("6.库存信息查询");
     goToXY(29,11);
-    printf("7.分页显示商品信息");
+    printf("6.销量信息查询");
     goToXY(29,12);
-    printf("8.更新基本信息");
+    printf("7.分页显示商品信息");
     goToXY(29,13);
-    printf("9.查询商品信息");
+    printf("8.更新基本信息");
     goToXY(29,14);
-    printf("10.更改界面颜色");
+    printf("10.查询商品信息");
     goToXY(29,15);
-    printf("11.商品信息到处");
+    printf("11.更改界面颜色");
     goToXY(29,16);
-    printf("12.注销账户");
+    printf("12.商品信息导出");
     goToXY(29,17);
-    printf("13.退出");
+    printf("13.注销账户");
+    goToXY(29,18);
+    printf("14.退出");
 
 
 
@@ -213,7 +223,12 @@ void admin_main(char *name){
     goToXY(43,20);
     int choice;
     scanf("%d",&choice);
-    switch(choice){
+    switch_admin(choice,name);
+
+
+}
+void switch_admin(int choice,char *name){
+	switch(choice){
         case 1:
             break;
         case 2:
@@ -221,6 +236,26 @@ void admin_main(char *name){
         case 3:
             break;
         case 4:
+            system("cls");
+            drawBorder();
+            goToXY(28,3);
+            printf("****删除商品信息****");
+            goToXY(24,10);
+            printf("请输入要删除的商品编号:");
+            scanf("%d",&del_num);
+            del_comm(del_num);
+            progressBar("正在删除商品，请稍后！");
+            system("cls");
+            drawBorder();
+            goToXY(30,9);
+            printf("商品编号：%d",del_num);
+            goToXY(25,11);
+            printf("商品删除成功，按任意键继续！");
+            getch();
+            system("cls");
+            admin_main(name);
+
+
             break;
         case 5:
             break;
@@ -239,11 +274,12 @@ void admin_main(char *name){
         case 12:
             break;
         case 13:
+            break;
+        case 14:
             system("cls");
             start();
             break;
     }
-
 }
 void cus_main(char *name){
     drawBorder();
@@ -286,7 +322,10 @@ void cus_main(char *name){
     goToXY(43,20);
     int choice;
     scanf("%d",&choice);
-    switch(choice){
+    switch_cus(choice);
+}
+void switch_cus(int choice){
+	switch(choice){
         case 1:
             break;
         case 2:
@@ -310,14 +349,14 @@ void cus_main(char *name){
         case 11:
             break;
         case 12:
-            system("cls");
+        	system("cls");
             start();
             break;
     }
 }
-void progressBar(){
+void progressBar(char *text){
     goToXY(26,21);
-    printf("系统正在加载，请稍后！");
+    printf(text);
     goToXY(19,19);
     for(i = 0;i <= 20;i++){
         goToXY(19+i*2,19);
@@ -685,4 +724,22 @@ void cus_login_login(){
 void hideCursor(){
     CONSOLE_CURSOR_INFO cursor_info;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
+}
+void del_comm(int del_num){
+    FILE *file = fopen(PRODUCT,"ab+");
+    FILE *file_copy = fopen("copy.dat","ab+");
+    struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&comm,sizeof(struct commodity),1,file);
+        if(result != 0){
+            if(comm.num != del_num){
+                fwrite(&comm,sizeof(struct commodity),1,file_copy);
+            }
+        }
+    }
+    fclose(file);
+    remove(PRODUCT);
+    rename("copy.dat",PRODUCT);
+
 }
