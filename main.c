@@ -59,6 +59,9 @@ void hideCursor();
 void switch_admin(int choice,char *name);
 void switch_cus(int choice,char *name);
 void del_comm(char *name);
+void color_change(char *name);
+
+
 
 int i,j,k;//定义循环变量
 int del_num;
@@ -248,6 +251,7 @@ void switch_admin(int choice,char *name){
         case 10:
             break;
         case 11:
+            color_change(name);
             break;
         case 12:
             break;
@@ -321,6 +325,7 @@ void switch_cus(int choice,char *name){
         case 8:
             break;
         case 9:
+            color_change(name);
             break;
         case 10:
             break;
@@ -333,6 +338,7 @@ void switch_cus(int choice,char *name){
     }
 }
 void progressBar(char *text){
+    /*
     goToXY(26,21);
     printf(text);
     goToXY(19,19);
@@ -343,6 +349,7 @@ void progressBar(char *text){
         printf("%d%%",i*5);
         Sleep(100);
     }
+    */
 }
 void admin_login(){
     int state = 0;//0表示注册，1表示登陆
@@ -652,8 +659,7 @@ void admin_login_login(){
     goToXY(31,9);
     gets(login_pass);
 
-    goToXY(23,19);
-    printf("系统正在验证您的登陆信息，请稍后！");
+
 
     //验证账户
     int correct = 0;//验证状态
@@ -671,14 +677,7 @@ void admin_login_login(){
     }
     fclose(file);
 
-    goToXY(19,17);
-    for(i = 0;i <= 20;i++){
-        goToXY(19+i*2,17);
-        printf("▌");
-        goToXY(69,17);
-        printf("%d%%",i*5);
-        Sleep(100);
-    }
+    //progressBar("系统正在验证您的登录信息，请稍候！");
     system("cls");
     if(correct == 1){
         system("cls");
@@ -793,6 +792,75 @@ void del_comm(char *name){
     getch();
     system("cls");
     admin_main(name);
-
-
+}
+void color_change(char *name){
+    int state = 0;
+    system("cls");
+    drawBorder();
+    goToXY(28,3);
+    printf("****更改界面颜色****");
+    goToXY(26,8);
+    printf("①  ★  白底黑字");
+    goToXY(26,10);
+    printf("②      红底蓝字");
+    goToXY(26,12);
+    printf("③      黑底红字");
+    goToXY(26,14);
+    printf("④      绿底蓝字");
+    goToXY(26,16);
+    printf("⑤      黄底紫字");
+    goToXY(26,18);
+    printf("⑥      系统默认控制台颜色");
+    goToXY(26,20);
+    printf("⑦      退出并保存颜色设置");
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,8+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 6;
+            }
+            goToXY(30,8+state*2);
+            printf("★");
+        }
+        else if(choice == 80){
+            goToXY(30,8+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 7){
+                state = 0;
+            }
+            goToXY(30,8+state*2);
+            printf("★");
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    system("color F0");
+                    break;
+                case 1:
+                    system("color 40");
+                    break;
+                case 2:
+                    system("color 04");
+                    break;
+                case 3:
+                    system("color 21");
+                    break;
+                case 4:
+                    system("color 65");
+                    break;
+                case 5:
+                    system("color 3f");
+                    break;
+                case 6:
+                    system("cls");
+                    admin_main(name);
+                    break;
+            }
+        }
+    }
+    getchar();
 }
