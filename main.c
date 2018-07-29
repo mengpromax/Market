@@ -89,6 +89,9 @@ void cus_unsubscribe(char *name);
 void out_file(char *name,int ver);
 void info_change(char *name,int ver);
 void search_comm(char *name,int ver);
+void sales_ranking_query(char *name,int ver);
+
+
 
 int i,j,k;//定义循环变量
 int del_num;
@@ -151,6 +154,10 @@ void start(){
                     cus_login();
                     break;
                 case 2:
+                    system("cls");
+                    drawBorder();
+                    goToXY(28,11);
+                    printf("感谢您的使用，再见！");
                     goToXY(0,24);
                     exit(0);
             }
@@ -227,7 +234,7 @@ void admin_main(char *name){
     goToXY(29,10);
     printf("6.关键字查询");
     goToXY(29,11);
-    printf("7.销量信息查询");
+    printf("7.销量排序查询");
     goToXY(29,12);
     printf("8.分页显示商品信息");
     goToXY(29,13);
@@ -275,7 +282,7 @@ void switch_admin(int choice,char *name){
             search_comm(name,1);
             break;
         case 7:
-
+            sales_ranking_query(name,1);
             break;
         case 8:
             show_page(PRODUCT,"商品信息",name,1);
@@ -361,6 +368,7 @@ void switch_cus(int choice,char *name){
             buy_record(name);
             break;
         case 6:
+            sales_ranking_query(name,2);
             break;
         case 7:
             info_change(name,2);
@@ -806,7 +814,7 @@ void admin_login_login(){
         drawBorder();
         goToXY(30,9);
         printf("用户名：%s",login_name);
-        goToXY(25,11);
+        goToXY(23,11);
         printf("用户名或密码错误，按任意键继续！");
         getch();
         system("cls");
@@ -874,7 +882,7 @@ void cus_login_login(){
         drawBorder();
         goToXY(30,9);
         printf("用户名：%s",login_name);
-        goToXY(25,11);
+        goToXY(23,11);
         printf("用户名或密码错误，按任意键继续！");
         getch();
         system("cls");
@@ -1058,7 +1066,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
     drawInBorder();
     FILE *file = fopen(file_name,"ab+");
 
-    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
@@ -1240,7 +1248,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
     FILE *file = fopen(file_name,"ab+");
 
 
-    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -1429,7 +1437,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
     FILE *file = fopen(file_name,"ab+");
 
 
-    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -2340,4 +2348,52 @@ void search_comm(char *name,int ver){
      {
          show_page("copy2.dat","商品信息",name,2);
      }
+}
+void sales_ranking_query(char *name,int ver){
+    system("cls");
+    drawBorder();
+    goToXY(23,5);
+    char view_sort[30];
+    printf("输入您想查看的商品类别：");
+    scanf("%s",view_sort);
+    FILE *file =fopen("product.dat","ab+");
+    FILE *file_select=fopen("select.dat","ab+");
+    struct commodity select_comm= {0,"",0,0,"",0,"",0,""};
+    rewind(file);
+    struct commodity product_select[1000];
+    i=0;
+    while(!feof(file))
+    {
+        int result = fread(&select_comm,sizeof(struct commodity),1,file);
+        if(result != 0)
+        {
+            if(strcmp(select_comm.sort,view_sort)==0)
+            {
+                product_select[i]=select_comm;
+                fwrite(&select_comm,sizeof(struct commodity),1,file_select);
+                i++;
+            }
+        }
+    }
+    for(j=i-1; j>0; j--)
+    {
+        for(k=0; k<j; k++)
+        {
+            if(product_select[k].sold>product_select[k+1].sold)
+            {
+                struct commodity tmp=product_select[k];
+                product_select[k]=product_select[k+1];
+                product_select[k+1]=tmp;
+            }
+        }
+    }
+    fclose(file);
+    file_select=fopen("select.dat","w");   //删除原来数据
+    rewind(file_select);
+    for(j=0; j<i; j++)
+    {
+        fwrite(&product_select[j],sizeof(struct commodity),1,file_select);
+    }
+    fclose(file_select);
+	show_page("select.dat","商品销量排序",name,ver);
 }
