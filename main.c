@@ -1540,7 +1540,24 @@ void change_comm(char *name)
 void buy_record(char *name){
     system("cls");
     drawBorder();
-    show_page(BUY_RECORD,"¹ºÂò¼ÇÂ¼",name);
+    FILE *file = fopen(BUY_RECORD,"ab+");
+    FILE *file_tmp = fopen("tmp.dat","ab+");
+
+    struct record rec = {"","",0,""};
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&rec,sizeof(struct record),1,file);
+        if(result != 0){
+            if(!strcmp(name,rec.name)){
+                fwrite(&rec,sizeof(struct record),1,file_tmp);
+            }
+        }
+    }
+
+    fclose(file);
+    fclose(file_tmp);
+
+    show_page("tmp.dat","¹ºÂò¼ÇÂ¼",name);
 }
 void buy_product(char *name){
     int buy_code;
