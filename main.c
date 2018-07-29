@@ -574,27 +574,55 @@ void admin_register(){
 
 
 
-    if((!strcmp(code,"cjhz"))&&(!strcmp(admin.pass,admin.pass_double))){
+    if((!strcmp(code,"cjhz"))&&(!strcmp(admin.pass,admin.pass_double)))
+    {
 
         FILE *file;
         file = fopen(USER_1,"ab+");
-        fwrite(&admin,sizeof(struct user),1,file);
-        fclose(file);
+        rewind(file);
+        struct user User= {"","","","","",""};
+        while(!feof(file))
+        {
+            int result = fread(&User,sizeof(struct user),1,file);
+            if(result != 0)
+            {
+                if(strcmp(User.name,admin.name)==0)  break;
+            }
+        }
+        if(feof(file))
+        {
+            fwrite(&admin,sizeof(struct user),1,file);
+            fclose(file);
+            system("cls");
+            drawBorder();
+            goToXY(30,9);
+            printf("用户名：%s",admin.name);
+            goToXY(25,11);
+            printf("管理员身份注册成功，按任意键继续！");
+            getch();
+            system("cls");
+            admin_login();
+        }
+        else
+        {
+            system("cls");
+            drawBorder();
+            goToXY(25,11);
+            printf("用户名重复，注册失败！");
+            getch();
+            system("cls");
+            admin_login();
+        }
 
-
+    }
+    else{
         system("cls");
         drawBorder();
-        goToXY(30,9);
-        printf("用户名：%s",admin.name);
         goToXY(25,11);
-        printf("管理员身份注册成功，按任意键继续！");
+        printf("两次输入密码不一致，注册失败！");
         getch();
         system("cls");
         admin_login();
-
-    }else{
-        system("cls");
-        start();
     }
 
 
@@ -659,24 +687,55 @@ void cus_register(){
     }
     cus.pass_double[i]='\0';
 
-    if(!strcmp(cus.pass,cus.pass_double)){
+    if(!strcmp(cus.pass,cus.pass_double))
+    {
         FILE *file;
         file = fopen(USER_2,"ab+");
-        fwrite(&cus,sizeof(struct user),1,file);
-        fclose(file);
-
+        rewind(file);
+        struct user User= {"","","","","",""};
+        while(!feof(file))
+        {
+            int result = fread(&User,sizeof(struct user),1,file);
+            if(result != 0)
+            {
+                if(strcmp(User.name,cus.name)==0)  break;
+            }
+        }
+        if(feof(file))
+        {
+            fwrite(&cus,sizeof(struct user),1,file);
+            fclose(file);
+            system("cls");
+            drawBorder();
+            goToXY(30,9);
+            printf("用户名：%s",cus.name);
+            goToXY(25,11);
+            printf("顾客身份注册成功，按任意键继续！");
+            getch();
+            system("cls");
+            cus_login();
+        }
+        else
+        {
+            system("cls");
+            drawBorder();
+            goToXY(25,11);
+            printf("用户名重复，注册失败！");
+            getch();
+            system("cls");
+            cus_login();
+        }
+    }
+    else
+    {
         system("cls");
+
         drawBorder();
-        goToXY(30,9);
-        printf("用户名：%s",cus.name);
         goToXY(25,11);
-        printf("顾客身份注册成功，按任意键继续！");
+        printf("两次输入密码不一致，注册失败！");
         getch();
         system("cls");
         cus_login();
-
-    }else{
-        system("cls");
         start();
     }
 
