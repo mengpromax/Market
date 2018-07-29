@@ -10,7 +10,6 @@
 //宏定义
 #define HEIGHT 23
 #define WIDTH 80
-#define LEN sizeof(struct commodity)
 #define USER_1 "user_1.dat"
 #define USER_2 "user_2.dat"
 #define PRODUCT "product.dat"
@@ -23,15 +22,14 @@ struct message{
     char contract[20];
     char date[30];
 };//保存用户的反馈信息
-
+//记录用户反馈信息
 struct record{
     char name[20];
     char product[30];
     int quantity;
     char date[15];
 };//保存用户的购买记录
-
-
+//记录用户购买记录
 struct commodity{
     int num;//商品编号
     char name[15];//商品名称
@@ -88,7 +86,7 @@ void buy_product(char *name);
 void sort_search(char *name,int ver);
 void admin_unsubscribe(char *name);
 void cus_unsubscribe(char *name);
-
+void out_file(char *name,int ver);
 
 
 
@@ -227,7 +225,7 @@ void admin_main(char *name){
     goToXY(29,9);
     printf("5.用户反馈信息");
     goToXY(29,10);
-    printf("6.库存信息查询");
+    printf("6.关键字查询");
     goToXY(29,11);
     printf("6.销量信息查询");
     goToXY(29,12);
@@ -319,7 +317,7 @@ void cus_main(char *name){
     goToXY(29,11);
     printf("7.更新基本信息");
     goToXY(29,12);
-    printf("8.查询商品信息");
+    printf("8.分页查看商品信息");
     goToXY(29,13);
     printf("9.更改界面颜色");
     goToXY(29,14);
@@ -362,6 +360,7 @@ void switch_cus(int choice,char *name){
         case 7:
             break;
         case 8:
+            show_page(PRODUCT,"商品信息",name,2);
             break;
         case 9:
             color_change(name);
@@ -1055,34 +1054,57 @@ void show_page(char *file_name,char *str,char *name,int ver){
     FILE *file = fopen(file_name,"ab+");
 
     if(!strcmp(file_name,PRODUCT)){
-        struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+        if(ver == 1){
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
             printf("商品编号 商品名称 商品描述 商品类别 生产商 销售量 库存量 进价 售价");
+                for(i = 1;i < 6;i ++){
+                    int result = fread(&comm,sizeof(struct commodity),1,file);
+                    if(result == 1){
+                        goToXY(6,4+3*i);
+                        printf("%d",comm.num);
+                        goToXY(15,4+3*i);
+                        printf("%s",comm.name);
+                        goToXY(25,4+3*i);
+                        printf("%s",comm.desc);
+                        goToXY(33,4+3*i);
+                        printf("%s",comm.sort);
+                        goToXY(42,4+3*i);
+                        printf("%s",comm.provider);
+                        goToXY(50,4+3*i);
+                        printf("%d",comm.sold);
+                        goToXY(56,4+3*i);
+                        printf("%d",comm.count);
+                        goToXY(63,4+3*i);
+                        printf("%.1lf",comm.in_price);
+                        goToXY(68,4+3*i);
+                        printf("%.1lf",comm.out_price);
+                    }else{
+                        break;
+                    }
+                }
+        }else if(ver == 2){
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+            goToXY(6,4);
+            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
                     goToXY(6,4+3*i);
                     printf("%d",comm.num);
-                    goToXY(15,4+3*i);
+                    goToXY(16,4+3*i);
                     printf("%s",comm.name);
-                    goToXY(25,4+3*i);
+                    goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(33,4+3*i);
-                    printf("%s",comm.sort);
-                    goToXY(42,4+3*i);
-                    printf("%s",comm.provider);
-                    goToXY(50,4+3*i);
-                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
-                    printf("%d",comm.count);
-                    goToXY(63,4+3*i);
-                    printf("%.1lf",comm.in_price);
-                    goToXY(68,4+3*i);
+                    printf("%s",comm.provider);
+                    goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                 }else{
                     break;
                 }
             }
+        }
     }else if(!strcmp(file_name,MES)){
         struct message mes = {"","","",""};
             goToXY(6,4);
@@ -1214,35 +1236,59 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
 
 
     if(!strcmp(file_name,PRODUCT)){
-        fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
-        struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
-        goToXY(6,4);
-        printf("商品编号 商品名称 商品描述 商品类别 生产商 销售量 库存量 进价 售价");
+        if(ver == 1){
+            fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+            goToXY(6,4);
+            printf("商品编号 商品名称 商品描述 商品类别 生产商 销售量 库存量 进价 售价");
+                for(i = 1;i < 6;i ++){
+                    int result = fread(&comm,sizeof(struct commodity),1,file);
+                    if(result == 1){
+                        goToXY(6,4+3*i);
+                        printf("%d",comm.num);
+                        goToXY(15,4+3*i);
+                        printf("%s",comm.name);
+                        goToXY(25,4+3*i);
+                        printf("%s",comm.desc);
+                        goToXY(33,4+3*i);
+                        printf("%s",comm.sort);
+                        goToXY(42,4+3*i);
+                        printf("%s",comm.provider);
+                        goToXY(50,4+3*i);
+                        printf("%d",comm.sold);
+                        goToXY(56,4+3*i);
+                        printf("%d",comm.count);
+                        goToXY(63,4+3*i);
+                        printf("%.1lf",comm.in_price);
+                        goToXY(68,4+3*i);
+                        printf("%.1lf",comm.out_price);
+                    }else{
+                        break;
+                    }
+                }
+        }else if(ver == 2){
+            fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+            goToXY(6,4);
+            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
                     goToXY(6,4+3*i);
                     printf("%d",comm.num);
-                    goToXY(15,4+3*i);
+                    goToXY(16,4+3*i);
                     printf("%s",comm.name);
-                    goToXY(25,4+3*i);
+                    goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(33,4+3*i);
-                    printf("%s",comm.sort);
-                    goToXY(42,4+3*i);
-                    printf("%s",comm.provider);
-                    goToXY(50,4+3*i);
-                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
-                    printf("%d",comm.count);
-                    goToXY(63,4+3*i);
-                    printf("%.1lf",comm.in_price);
-                    goToXY(68,4+3*i);
+                    printf("%s",comm.provider);
+                    goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                 }else{
                     break;
                 }
             }
+        }
     }else if(!strcmp(file_name,MES)){
         fseek(file,sizeof(struct message)*5*num,SEEK_SET);
         struct message mes = {"","","",""};
@@ -1379,35 +1425,59 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
 
 
     if(!strcmp(file_name,PRODUCT)){
-        fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
-        struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
-        goToXY(6,4);
-        printf("商品编号 商品名称 商品描述 商品类别 生产商 销售量 库存量 进价 售价");
+        if(ver == 1){
+            fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+            goToXY(6,4);
+            printf("商品编号 商品名称 商品描述 商品类别 生产商 销售量 库存量 进价 售价");
+                for(i = 1;i < 6;i ++){
+                    int result = fread(&comm,sizeof(struct commodity),1,file);
+                    if(result == 1){
+                        goToXY(6,4+3*i);
+                        printf("%d",comm.num);
+                        goToXY(15,4+3*i);
+                        printf("%s",comm.name);
+                        goToXY(25,4+3*i);
+                        printf("%s",comm.desc);
+                        goToXY(33,4+3*i);
+                        printf("%s",comm.sort);
+                        goToXY(42,4+3*i);
+                        printf("%s",comm.provider);
+                        goToXY(50,4+3*i);
+                        printf("%d",comm.sold);
+                        goToXY(56,4+3*i);
+                        printf("%d",comm.count);
+                        goToXY(63,4+3*i);
+                        printf("%.1lf",comm.in_price);
+                        goToXY(68,4+3*i);
+                        printf("%.1lf",comm.out_price);
+                    }else{
+                        break;
+                    }
+                }
+        }else if(ver == 2){
+            fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
+            struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+            goToXY(6,4);
+            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
                     goToXY(6,4+3*i);
                     printf("%d",comm.num);
-                    goToXY(15,4+3*i);
+                    goToXY(16,4+3*i);
                     printf("%s",comm.name);
-                    goToXY(25,4+3*i);
+                    goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(33,4+3*i);
-                    printf("%s",comm.sort);
-                    goToXY(42,4+3*i);
-                    printf("%s",comm.provider);
-                    goToXY(50,4+3*i);
-                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
-                    printf("%d",comm.count);
-                    goToXY(63,4+3*i);
-                    printf("%.1lf",comm.in_price);
-                    goToXY(68,4+3*i);
+                    printf("%s",comm.provider);
+                    goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                 }else{
                     break;
                 }
             }
+        }
     }else if(!strcmp(file_name,MES)){
         fseek(file,sizeof(struct message)*5*num,SEEK_SET);
         struct message mes = {"","","",""};
@@ -2062,4 +2132,7 @@ void cus_unsubscribe(char *name){
         }
 
     }
+}
+void out_file(char *name,int ver){
+
 }
