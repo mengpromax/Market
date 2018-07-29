@@ -86,6 +86,10 @@ void add_comm(char *name);
 void buy_record(char *name);
 void buy_product(char *name);
 void sort_search(char *name);
+void admin_unsubscribe(char *name);
+void cus_unsubscribe(char *name);
+
+
 
 
 int i,j,k;//定义循环变量
@@ -285,6 +289,7 @@ void switch_admin(int choice,char *name){
         case 12:
             break;
         case 13:
+            admin_unsubscribe(name);
             break;
         case 14:
             system("cls");
@@ -362,6 +367,7 @@ void switch_cus(int choice,char *name){
         case 10:
             break;
         case 11:
+            cus_unsubscribe(name);
             break;
         case 12:
         	system("cls");
@@ -521,15 +527,14 @@ void admin_register(){
     goToXY(20,16);
     printf("重复密码：");
 
-
     goToXY(27,9);
-    gets(admin.name);
+    scanf("%s",admin.name);
     goToXY(27,10);
-    gets(admin.sex);
+    scanf("%s",admin.sex);
     goToXY(27,11);
-    gets(admin.mail);
+    scanf("%s",admin.mail);
     goToXY(29,12);
-    gets(admin.phone);
+    scanf("%s",admin.phone);
     goToXY(35,13);
     gets(code);
     goToXY(27,15);
@@ -614,13 +619,13 @@ void cus_register(){
 
 
     goToXY(27,9);
-    gets(cus.name);
+    scanf("%s",cus.name);
     goToXY(27,10);
-    gets(cus.sex);
+    scanf("%s",cus.sex);
     goToXY(27,11);
-    gets(cus.mail);
+    scanf("%s",cus.mail);
     goToXY(29,12);
-    gets(cus.phone);
+    scanf("%s",cus.phone);
     goToXY(27,15);
     i=0;
     char pw;
@@ -1654,4 +1659,164 @@ void buy_product(char *name){
 }
 void sort_search(char *name){
 
+}
+void admin_unsubscribe(char *name)
+{
+    int state=0;
+    system("cls");
+    drawBorder();
+    goToXY(28,3);
+    printf("你确定要注销该账号？");
+    goToXY(26,12);
+    printf("①  ★  确定");
+    goToXY(26,14);
+    printf("②      取消");
+    while(TRUE)
+    {
+        char choice;
+        choice = getch();
+        if(choice == 72)
+        {
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1)
+            {
+                state = 1;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80)
+        {
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2)
+            {
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == '\r')
+        {
+            switch(state)
+            {
+            case 0:
+               {
+                FILE *file = fopen("user_1.dat","ab+");
+                FILE *file_copy = fopen("copy.dat","ab+");
+                struct user User= {"","","","","",""};
+                rewind(file);
+                while(!feof(file))
+                {
+                    int result = fread(&User,sizeof(struct user),1,file);
+                    if(result != 0)
+                    {
+                        if(strcmp(User.name,name)!=0)
+                        {
+                            fwrite(&User,sizeof(struct user),1,file_copy);
+                        }
+                    }
+                }
+                fclose(file);
+                fclose(file_copy);
+                remove("user_1.dat");
+                rename("copy.dat","user_1.dat");
+                system("cls");
+                drawBorder();
+                goToXY(30,9);
+                printf("账户注销成功，按任意键退出！");
+                getch();
+                system("cls");
+                start();
+                break;}
+            case 1:
+                system("cls");
+                admin_main(name);
+            }
+        }
+
+    }
+}
+void cus_unsubscribe(char *name)
+{
+    int state=0;
+    system("cls");
+    drawBorder();
+    goToXY(28,3);
+    printf("你确定要注销该账号？");
+    goToXY(26,12);
+    printf("①  ★  确定");
+    goToXY(26,14);
+    printf("②      取消");
+    while(TRUE)
+    {
+        char choice;
+        choice = getch();
+        if(choice == 72)
+        {
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1)
+            {
+                state = 1;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80)
+        {
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2)
+            {
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == '\r')
+        {
+            switch(state)
+            {
+            case 0:
+               {
+                FILE *file = fopen("user_2.dat","ab+");
+                FILE *file_copy = fopen("copy.dat","ab+");
+                struct user User= {"","","","","",""};
+                rewind(file);
+                while(!feof(file))
+                {
+                    int result = fread(&User,sizeof(struct user),1,file);
+                    if(result != 0)
+                    {
+                        if(strcmp(User.name,name)!=0)
+                        {
+                            fwrite(&User,sizeof(struct user),1,file_copy);
+                        }
+                    }
+                }
+                fclose(file);
+                fclose(file_copy);
+                remove("user_2.dat");
+                rename("copy.dat","user_2.dat");
+                system("cls");
+                drawBorder();
+                goToXY(30,9);
+                printf("账户注销成功，按任意键退出！");
+                getch();
+                system("cls");
+                start();
+                break;}
+            case 1:
+                system("cls");
+                cus_main(name);
+            }
+        }
+
+    }
 }
