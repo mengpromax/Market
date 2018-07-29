@@ -227,11 +227,11 @@ void admin_main(char *name){
     goToXY(29,10);
     printf("6.关键字查询");
     goToXY(29,11);
-    printf("6.销量信息查询");
+    printf("7.销量信息查询");
     goToXY(29,12);
-    printf("7.分页显示商品信息");
+    printf("8.分页显示商品信息");
     goToXY(29,13);
-    printf("8.更新基本信息");
+    printf("9.更新基本信息");
     goToXY(29,14);
     printf("10.查询商品信息");
     goToXY(29,15);
@@ -272,11 +272,13 @@ void switch_admin(int choice,char *name){
             receive_mes(name);
             break;
         case 6:
+
             break;
         case 7:
-            show_page(PRODUCT,"商品信息",name,1);
+
             break;
         case 8:
+            show_page(PRODUCT,"商品信息",name,1);
             break;
         case 9:
             break;
@@ -286,6 +288,7 @@ void switch_admin(int choice,char *name){
             color_change(name);
             break;
         case 12:
+            out_file(name,1);
             break;
         case 13:
             admin_unsubscribe(name);
@@ -366,6 +369,7 @@ void switch_cus(int choice,char *name){
             color_change(name);
             break;
         case 10:
+            out_file(name,2);
             break;
         case 11:
             cus_unsubscribe(name);
@@ -2134,5 +2138,53 @@ void cus_unsubscribe(char *name){
     }
 }
 void out_file(char *name,int ver){
-
+    if(ver == 1){
+        FILE *file_out = fopen("信息导出_管理员.txt","w");
+        FILE *file = fopen(PRODUCT,"ab+");
+        struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+        while(!feof(file)){
+            char info[100];
+            int result = fread(&comm,sizeof(struct commodity),1,file);
+            if(result == 1){
+                sprintf(info,"%d-%s-%s-%s-%s-%d-%d-%.1lf-%.1lf\n",comm.num,comm.name,comm.desc,comm.sort,comm.provider,comm.sold,comm.count,comm.in_price,comm.out_price);
+                fputs(info,file_out);
+            }
+        }
+        fclose(file);
+        fclose(file_out);
+        system("cls");
+        drawBorder();
+        progressBar("正在将系统商品数据转存为文件，请稍候！");
+        system("cls");
+        drawBorder();
+        goToXY(25,11);
+        printf("商品信息导出成功，按任意键继续！");
+        getch();
+        system("cls");
+        admin_main(name);
+    }else if(ver == 2){
+        FILE *file_out = fopen("信息导出_顾客用户.txt","w");
+        FILE *file = fopen(PRODUCT,"ab+");
+        struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+        while(!feof(file)){
+            char info[100];
+            int result = fread(&comm,sizeof(struct commodity),1,file);
+            if(result == 1){
+                sprintf(info,"%d-%s-%s-%s-%s-%d-%.1lf\n",comm.num,comm.name,comm.desc,comm.sort,comm.provider,comm.sold,comm.out_price);
+                fputs(info,file_out);
+            }
+        }
+        fclose(file);
+        fclose(file_out);
+        system("cls");
+        drawBorder();
+        progressBar("正在将系统商品数据转存为文件，请稍候！");
+        system("cls");
+        drawBorder();
+        goToXY(25,11);
+        printf("商品信息导出成功，按任意键继续！");
+        getch();
+        system("cls");
+        cus_main(name);
+    }
 }
