@@ -272,7 +272,7 @@ void switch_admin(int choice,char *name){
             receive_mes(name);
             break;
         case 6:
-
+            search_comm(name,1);
             break;
         case 7:
 
@@ -349,6 +349,7 @@ void switch_cus(int choice,char *name){
             buy_product(name);
             break;
         case 2:
+            search_comm(name,2);
             break;
         case 3:
             sort_search(name,2);
@@ -1057,7 +1058,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
     drawInBorder();
     FILE *file = fopen(file_name,"ab+");
 
-    if(!strcmp(file_name,PRODUCT)){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
         if(ver == 1){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
@@ -1239,7 +1240,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
     FILE *file = fopen(file_name,"ab+");
 
 
-    if(!strcmp(file_name,PRODUCT)){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
         if(ver == 1){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -1428,7 +1429,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
     FILE *file = fopen(file_name,"ab+");
 
 
-    if(!strcmp(file_name,PRODUCT)){
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat")){
         if(ver == 1){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -2301,7 +2302,7 @@ void info_change(char *name,int ver){
         cus_login_login();
 }
 void search_comm(char *name,int ver){
-system("cls");
+     system("cls");
      drawBorder();
      goToXY(28,3);
      printf("****关键字查询商品****");
