@@ -536,7 +536,7 @@ void admin_register(){
     goToXY(29,12);
     scanf("%s",admin.phone);
     goToXY(35,13);
-    gets(code);
+    scanf("%s",code);
     goToXY(27,15);
     i=0;
     char pw;
@@ -1658,6 +1658,12 @@ void buy_product(char *name){
     }
 }
 void sort_search(char *name){
+    system("cls");
+    drawBorder();
+    char input[20];
+    goToXY(23,3);
+    printf("****分类查询页面,个性化您的查询！****");
+
 
 }
 void admin_unsubscribe(char *name)
@@ -1726,7 +1732,7 @@ void admin_unsubscribe(char *name)
                 rename("copy.dat","user_1.dat");
                 system("cls");
                 drawBorder();
-                goToXY(30,9);
+                goToXY(28,9);
                 printf("账户注销成功，按任意键退出！");
                 getch();
                 system("cls");
@@ -1737,7 +1743,6 @@ void admin_unsubscribe(char *name)
                 admin_main(name);
             }
         }
-
     }
 }
 void cus_unsubscribe(char *name)
@@ -1806,7 +1811,7 @@ void cus_unsubscribe(char *name)
                 rename("copy.dat","user_2.dat");
                 system("cls");
                 drawBorder();
-                goToXY(30,9);
+                goToXY(28,9);
                 printf("账户注销成功，按任意键退出！");
                 getch();
                 system("cls");
