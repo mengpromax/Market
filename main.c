@@ -77,9 +77,9 @@ void color_change(char *name);
 void send_mes(char *name);
 void receive_mes(char *name);
 int count_mes();//计算用户反馈信息的条数
-void show_page(char *file_name,char *str,char *name);
-void page_up(char *file_name,char *str,int num,char *name);
-void page_down(char *file_name,char *str,int num,char *name);
+void show_page(char *file_name,char *str,char *name,int ver);
+void page_up(char *file_name,char *str,int num,char *name,int ver);
+void page_down(char *file_name,char *str,int num,char *name,int ver);
 void drawInBorder();//画出分页查询的内部表格边框
 void change_comm(char *name);
 void add_comm(char *name);
@@ -271,7 +271,7 @@ void switch_admin(int choice,char *name){
         case 6:
             break;
         case 7:
-            show_page(PRODUCT,"商品信息",name);
+            show_page(PRODUCT,"商品信息",name,1);
             break;
         case 8:
             break;
@@ -963,7 +963,7 @@ void receive_mes(char *name){
     drawBorder();
     //goToXY(23,3);
     //printf("****这里存放着%d封用户反馈的信息！****",count_mes());
-    show_page(MES,"用户反馈",name);
+    show_page(MES,"用户反馈",name,1);
 
 }
 int count_mes(){
@@ -980,7 +980,7 @@ int count_mes(){
     fclose(file);
     return count;
 }
-void show_page(char *file_name,char *str,char *name){
+void show_page(char *file_name,char *str,char *name,int ver){
 
 
     int page_num = 0;//记录当前的翻页数
@@ -1071,22 +1071,28 @@ void show_page(char *file_name,char *str,char *name){
     switch(choice){
         case 110://N键
             page_num++;
-            page_down(file_name,str,page_num,name);
+            page_down(file_name,str,page_num,name,ver);
             break;
         case 112://P键
             page_num--;
             if(page_num < 0){
                 page_num = 0;
             }
-            page_up(file_name,str,page_num,name);
+            page_up(file_name,str,page_num,name,ver);
             break;
         case 27:
             system("cls");
-            admin_main(name);
+            switch(ver){
+                case 1:
+                    admin_main(name);
+                    break;
+                case 2:
+                    cus_main(name);
+            }
             break;
     }
 }
-void page_up(char *file_name,char *str,int num,char *name){
+void page_up(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
@@ -1180,22 +1186,28 @@ void page_up(char *file_name,char *str,int num,char *name){
     switch(choice){
         case 110://N键
             num++;
-            page_down(file_name,str,num,name);
+            page_down(file_name,str,num,name,ver);
             break;
         case 112://P键
             num--;
             if(num < 0){
                 num = 0;
             }
-            page_up(file_name,str,num,name);
+            page_up(file_name,str,num,name,ver);
             break;
         case 27:
             system("cls");
-            admin_main(name);
+            switch(ver){
+                case 1:
+                    admin_main(name);
+                    break;
+                case 2:
+                    cus_main(name);
+            }
             break;
     }
 }
-void page_down(char *file_name,char *str,int num,char *name){
+void page_down(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
@@ -1287,18 +1299,24 @@ void page_down(char *file_name,char *str,int num,char *name){
     switch(choice){
         case 110://N键
             num++;
-            page_down(file_name,str,num,name);
+            page_down(file_name,str,num,name,ver);
             break;
         case 112://P键
             num--;
             if(num < 0){
                 num = 0;
             }
-            page_up(file_name,str,num,name);
+            page_up(file_name,str,num,name,ver);
             break;
         case 27:
             system("cls");
-            admin_main(name);
+            switch(ver){
+                case 1:
+                    admin_main(name);
+                    break;
+                case 2:
+                    cus_main(name);
+            }
             break;
     }
 }
@@ -1541,6 +1559,7 @@ void change_comm(char *name)
 void buy_record(char *name){
     system("cls");
     drawBorder();
+    remove("tmp.dat");
     FILE *file = fopen(BUY_RECORD,"ab+");
     FILE *file_tmp = fopen("tmp.dat","ab+");
 
@@ -1558,7 +1577,7 @@ void buy_record(char *name){
     fclose(file);
     fclose(file_tmp);
 
-    show_page("tmp.dat","购买记录",name);
+    show_page("tmp.dat","购买记录",name,2);
 }
 void buy_product(char *name){
     int state = 0;//表示查询商品时的状态
