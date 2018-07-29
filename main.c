@@ -15,13 +15,22 @@
 #define USER_2 "user_2.dat"
 #define PRODUCT "product.dat"
 #define MES "mes.dat"
+#define BUY_RECORD "buy_record.dat"
 
 struct message{
     char name[30];
     char content[100];
     char contract[20];
     char date[30];
-};
+};//保存用户的反馈信息
+
+struct record{
+    char name[20];
+    char product[30];
+    int quantity;
+    char date[15];
+};//保存用户的购买记录
+
 
 struct commodity{
     int num;//商品编号
@@ -74,6 +83,8 @@ void page_down(char *file_name,char *str,int num,char *name);
 void drawInBorder();//画出分页查询的内部表格边框
 void change_comm(char *name);
 void add_comm(char *name);
+void buy_record(char *name);
+void buy_product(char *name);
 
 
 int i,j,k;//定义循环变量
@@ -326,6 +337,7 @@ void cus_main(char *name){
 void switch_cus(int choice,char *name){
 	switch(choice){
         case 1:
+            buy_product(name);
             break;
         case 2:
             break;
@@ -335,6 +347,7 @@ void switch_cus(int choice,char *name){
             send_mes(name);
             break;
         case 5:
+            buy_record(name);
             break;
         case 6:
             break;
@@ -923,9 +936,14 @@ void send_mes(char *name){
     goToXY(52,10);
     scanf("%s",mes.contract);
     strcpy(mes.name,name);
-    strcpy(mes.date,"2018-07-28");
 
-
+    char date[10];
+    time_t timep;
+    struct tm *p;
+    time (&timep);
+    p=gmtime(&timep);
+    sprintf(date,"%d-%d-%d",p->tm_year + 1900,p->tm_mon + 1,p->tm_mday);
+    strcpy(mes.date,date);
 
     FILE *file = fopen(MES,"ab+");
     fwrite(&mes,sizeof(struct message),1,file);
@@ -1024,6 +1042,27 @@ void show_page(char *file_name,char *str,char *name){
                     break;
                 }
             }
+    }else if(!strcmp(file_name,BUY_RECORD)){
+        struct record rec = {"","",0,""};
+        for(i = 0;i < 6;i ++){
+                if(i == 1){
+                    goToXY(6,4);
+                    printf("购买用户昵称\t商品名称\t\t商品件数\t购买日期");
+                }
+                int result = fread(&rec,sizeof(struct record),1,file);
+                if(result == 1){
+                    goToXY(6,4+3*i);
+                    printf("%s",rec.name);
+                    goToXY(25,4+3*i);
+                    printf("%s",rec.product);
+                    goToXY(49,4+3*i);
+                    printf("%d",rec.quantity);
+                    goToXY(65,4+3*i);
+                    printf("%s",rec.date);
+                }else{
+                    break;
+                }
+            }
     }
 
     fclose(file);
@@ -1106,6 +1145,28 @@ void page_up(char *file_name,char *str,int num,char *name){
                     printf("%s",mes.contract);
                     goToXY(65,4+3*i);
                     printf("%s",mes.date);
+                }else{
+                    break;
+                }
+            }
+    }else if(!strcmp(file_name,BUY_RECORD)){
+        fseek(file,sizeof(struct record)*5*num,SEEK_SET);
+        struct record rec = {"","",0,""};
+        for(i = 0;i < 6;i ++){
+                if(i == 1){
+                    goToXY(6,4);
+                    printf("购买用户昵称\t商品名称\t\t商品件数\t购买日期");
+                }
+                int result = fread(&rec,sizeof(struct record),1,file);
+                if(result == 1){
+                    goToXY(6,4+3*i);
+                    printf("%s",rec.name);
+                    goToXY(25,4+3*i);
+                    printf("%s",rec.product);
+                    goToXY(49,4+3*i);
+                    printf("%d",rec.quantity);
+                    goToXY(65,4+3*i);
+                    printf("%s",rec.date);
                 }else{
                     break;
                 }
@@ -1193,6 +1254,28 @@ void page_down(char *file_name,char *str,int num,char *name){
                     printf("%s",mes.contract);
                     goToXY(65,4+3*i);
                     printf("%s",mes.date);
+                }else{
+                    break;
+                }
+            }
+    }else if(!strcmp(file_name,BUY_RECORD)){
+        fseek(file,sizeof(struct record)*5*num,SEEK_SET);
+        struct record rec = {"","",0,""};
+        for(i = 0;i < 6;i ++){
+                if(i == 1){
+                    goToXY(6,4);
+                    printf("购买用户昵称\t商品名称\t\t商品件数\t购买日期");
+                }
+                int result = fread(&rec,sizeof(struct record),1,file);
+                if(result == 1){
+                    goToXY(6,4+3*i);
+                    printf("%s",rec.name);
+                    goToXY(25,4+3*i);
+                    printf("%s",rec.product);
+                    goToXY(49,4+3*i);
+                    printf("%d",rec.quantity);
+                    goToXY(65,4+3*i);
+                    printf("%s",rec.date);
                 }else{
                     break;
                 }
@@ -1453,4 +1536,20 @@ void change_comm(char *name)
                 system("cls");
                 admin_main(name);
          }
+}
+void buy_record(char *name){
+    system("cls");
+    drawBorder();
+    show_page(BUY_RECORD,"购买记录",name);
+}
+void buy_product(char *name){
+    int buy_code;
+    system("cls");
+    drawBorder();
+    goToXY(23,3);
+    printf("****商品选购页面,期待着您的光临！****");
+    goToXY(20,6);
+    printf("请输入您要搜索的商品编号：");
+
+
 }
