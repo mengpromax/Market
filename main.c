@@ -16,6 +16,8 @@
 #define MES "mes.dat"
 #define BUY_RECORD "buy_record.dat"
 #define VAULT "vault.dat"
+#define DAY_SOLD "day_sold.dat"
+
 
 struct message{
     char name[30];
@@ -52,7 +54,10 @@ struct user{
     char pass_double[20];
 };
 //保存用户的信息
-
+struct day_sold{
+    char date[10];
+    int count;
+};
 
 
 void start();
@@ -95,11 +100,17 @@ void buttom_title(int num);
 void del_pro(int del_num);
 double vault(double out_price,int number);
 void alert(char *name);
+void sold_chart(char *name);
+int count_days(char *min_date,char *max_date);
+void show_chart(char *name,int days);
+void chart_up(int num,char *name,int days);
+void chart_down(int num,char *name,int days);
+int count_sold();
 
 
 
 int i,j,k;//定义循环变量
-int del_num;
+
 
 int main(){
     system("mode con cols=80 lines=24");
@@ -247,13 +258,15 @@ void admin_main(char *name){
     goToXY(29,13);
     printf("9.更新基本信息");
     goToXY(29,14);
-    printf("10.更改界面颜色");
+    printf("10.销量日报表");
     goToXY(29,15);
-    printf("11.商品信息导出");
+    printf("11.更改界面颜色");
     goToXY(29,16);
-    printf("12.注销账户");
+    printf("12.商品信息导出");
     goToXY(29,17);
-    printf("13.退出");
+    printf("13.注销账户");
+    goToXY(29,18);
+    printf("14.退出");
     goToXY(25,20);
     printf("请输入您的选择：|");
     goToXY(45,20);
@@ -295,15 +308,18 @@ void switch_admin(int choice,char *name){
             info_change(name,1);
             break;
         case 10:
-            color_change(name);
+            sold_chart(name);
             break;
         case 11:
-            out_file(name,1);
+            color_change(name);
             break;
         case 12:
-            admin_unsubscribe(name);
+            out_file(name,1);
             break;
         case 13:
+            admin_unsubscribe(name);
+            break;
+        case 14:
             system("cls");
             start();
             break;
@@ -396,6 +412,7 @@ void switch_cus(int choice,char *name){
     }
 }
 void progressBar(char *text){
+    /*
     goToXY(26,21);
     printf(text);
     goToXY(19,19);
@@ -406,6 +423,7 @@ void progressBar(char *text){
         printf("%d%%",i*5);
         Sleep(100);
     }
+    */
 }
 void admin_login(){
     int state = 0;//0表示注册，1表示登陆
@@ -602,7 +620,8 @@ void admin_register(){
             int result = fread(&User,sizeof(struct user),1,file);
             if(result != 0)
             {
-                if(strcmp(User.name,admin.name)==0)  break;
+                if(strcmp(User.name,admin.name)==0)
+                break;
             }
         }
         if(feof(file))
@@ -897,6 +916,7 @@ void hideCursor(){
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
 }
 void del_comm(char *name){
+    int del_num;
     system("cls");
     drawBorder();
     goToXY(28,3);
@@ -1079,6 +1099,15 @@ int count(char *file_name){
                 count ++;
             }
         }
+    }else if(!strcmp(file_name,DAY_SOLD)){
+        struct day_sold ds = {"",0};
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&ds,sizeof(struct day_sold),1,file);
+            if(result != 0){
+                count ++;
+            }
+        }
     }
     fclose(file);
     return count;
@@ -1238,7 +1267,6 @@ void show_page(char *file_name,char *str,char *name,int ver){
         }
 
     }
-
     fclose(file);
     int state = 1;
     int choice;
@@ -2506,4 +2534,297 @@ void alert(char *name){
     {
         show_page("copy1.dat","库存过低的商品",name,1);
     }
+}
+void sold_chart(char *name){
+    remove(DAY_SOLD);
+    int days = 0;
+    FILE *file = fopen(BUY_RECORD,"ab+");
+    system("cls");
+    drawBorder();
+    progressBar("正在为您生成日销量报表，请稍候！");
+    system("cls");
+    struct record rec = {"","",0,""};
+    rewind(file);
+    char min_date[10] = "2020-12-30";
+
+    while(!feof(file)){
+        int result = fread(&rec,sizeof(struct record),1,file);
+        if(result == 1 && (strcmp(rec.date,min_date) < 0)){
+            strcpy(min_date,rec.date);
+        }
+    }
+    char max_date[10];
+    time_t timep;
+    struct tm *p;
+    time (&timep);
+    p=gmtime(&timep);
+    sprintf(max_date,"%d-%d-%d",p->tm_year + 1900,p->tm_mon + 1,p->tm_mday);
+    days = count_days(min_date,max_date);
+    FILE *file_day = fopen(DAY_SOLD,"ab+");
+    struct day_sold ds = {"",0};
+    int count = 0;
+    int nouse_year;
+    int month;
+    int day;
+    sscanf(min_date,"%d-%d-%d",&nouse_year,&month,&day);
+    char date[10];
+    for(i = 0;i < days;i++){
+        count = 0;
+        sprintf(date,"%d-%d-%d",nouse_year,month,day);
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&rec,sizeof(struct record),1,file);
+            if(result == 1 && !strcmp(rec.date,date)){
+                count ++;
+            }
+        }
+        strcpy(ds.date,date);
+        ds.count = count;
+        fwrite(&ds,sizeof(struct day_sold),1,file_day);
+        day ++;
+        if(month == 1 || month == 3 || month == 5|| month == 7 || month == 8 || month == 10 || month == 12){
+            if(day == 32){
+                day = 1;
+                month++;
+            }
+        }else if(month == 2){
+            if(day == 29){
+                day =1;
+                month++;
+            }
+        }else{
+            if(day == 31){
+                day =1;
+                month++;
+            }
+        }
+
+    }
+
+    for(k = 0;k < 10;k++){
+        ds.count = 30;
+        strcpy(ds.date,"2010-10-10");
+        fwrite(&ds,sizeof(struct day_sold),1,file_day);
+    }
+
+    fclose(file);
+    fclose(file_day);
+    drawBorder();
+    drawInBorder();
+    goToXY(25,2);
+    printf("****以下是最近%d天的日销量情况****",count_sold());
+    show_chart(name,count_sold());
+}
+int count_sold(){
+    return count(DAY_SOLD);
+}
+void show_chart(char *name,int days){
+    int page_num = 0;//记录当前的翻页数
+    buttom_title(page_num);
+
+    FILE *file = fopen(DAY_SOLD,"ab+");
+    struct day_sold ds = {"",0};
+    rewind(file);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&ds,sizeof(struct day_sold),1,file);
+        if(result == 1){
+            char date[10];
+            int month;
+            int day;
+            sscanf(ds.date,"%d-%d-%d",&k,&month,&day);
+            sprintf(date,"%d-%d",month,day);
+            goToXY(4,1+3*i);
+            printf("%s: ",date);
+            for(j = 0;j < ds.count/5 + 1;j++){
+                printf("▌");
+            }
+            goToXY(70,1+3*i);
+            printf("%d件",ds.count);
+        }
+    }
+
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                page_num++;
+                if(page_num > count(DAY_SOLD)/5){
+                    page_num = count(DAY_SOLD)/5;
+                }
+                chart_down(page_num,name,days);
+                break;
+            case 112://P键
+                state = 0;
+                page_num--;
+                if(page_num < 0){
+                    page_num = 0;
+                }
+                chart_up(page_num,name,days);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                admin_main(name);
+                break;
+            default:
+                choice = getch();
+        }
+    }
+}
+void chart_up(int num,char *name,int days){
+    int nums = 0;//检索
+    system("cls");
+    drawBorder();
+    drawInBorder();
+    buttom_title(num);
+    goToXY(25,2);
+    printf("****以下是最近%d天的日销量情况****",days);
+    FILE *file = fopen(DAY_SOLD,"ab+");
+    struct day_sold ds = {"",0};
+    rewind(file);
+    fseek(file,sizeof(struct day_sold)*5*num,SEEK_SET);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&ds,sizeof(struct day_sold),1,file);
+        if(result == 1){
+            char date[10];
+            int month;
+            int day;
+            sscanf(ds.date,"%d-%d-%d",&k,&month,&day);
+            sprintf(date,"%d-%d",month,day);
+            goToXY(4,1+3*i);
+            printf("%s: ",date);
+            for(j = 0;j < ds.count/5 + 1;j++){
+                printf("▌");
+            }
+            goToXY(70,1+3*i);
+            printf("%d件",ds.count);
+        }
+    }
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                if(num > count(DAY_SOLD)/5){
+                    num = count(DAY_SOLD)/5;
+                }
+                chart_down(num,name,days);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                chart_up(num,name,days);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                admin_main(name);
+                break;
+            default:
+                choice = getch();
+        }
+    }
+}
+void chart_down(int num,char *name,int days){
+    int nums = 0;//检索
+    system("cls");
+    drawBorder();
+    drawInBorder();
+    buttom_title(num);
+    goToXY(25,2);
+    printf("****以下是最近%d天的日销量情况****",days);
+    FILE *file = fopen(DAY_SOLD,"ab+");
+    struct day_sold ds = {"",0};
+    rewind(file);
+    fseek(file,sizeof(struct day_sold)*5*num,SEEK_SET);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&ds,sizeof(struct day_sold),1,file);
+        if(result == 1){
+            char date[10];
+            int month;
+            int day;
+            sscanf(ds.date,"%d-%d-%d",&k,&month,&day);
+            sprintf(date,"%d-%d",month,day);
+            goToXY(4,1+3*i);
+            printf("%s: ",date);
+            for(j = 0;j < ds.count/5 + 1;j++){
+                printf("▌");
+            }
+            goToXY(70,1+3*i);
+            printf("%d件",ds.count);
+        }
+    }
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                if(num > count(DAY_SOLD)/5){
+                    num = count(DAY_SOLD)/5;
+                }
+                chart_down(num,name,days);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                chart_up(num,name,days);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                admin_main(name);
+                break;
+            default:
+                choice = getch();
+        }
+    }
+}
+int count_days(char *min_date,char *max_date){
+    int count = 0;
+    int max_year;
+    int max_month;
+    int max_day;
+    int min_year;
+    int min_month;
+    int min_day;
+    sscanf(max_date,"%d-%d-%d",&max_year,&max_month,&max_day);
+    sscanf(min_date,"%d-%d-%d",&min_year,&min_month,&min_day);
+    for(i = min_month + 1;i < max_month;i++){
+        if(i == 1 || i == 3 || i == 5|| i == 7 || i == 8 || i == 10 || i == 12){
+            count += 31;
+        }else if(i == 2){
+            count += 28;//暂时不管是不是闰年
+        }else{
+            count += 30;
+        }
+    }
+    if(max_month != min_month){
+        if(min_month == 1 || min_month == 3 || min_month == 5|| min_month == 7 || min_month == 8 || min_month == 10 || min_month == 12 ){
+            count += 32 - min_day;
+        }else if(min_month == 2){
+            count += 29 - min_day;//暂时不管是不是闰年
+        }else{
+            count += 31 - min_day;
+        }
+        count += max_day;
+    }else{
+        count += max_day - min_day + 1;
+    }
+
+    return count;
 }
