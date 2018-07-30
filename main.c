@@ -101,6 +101,7 @@ int del_num;
 
 int main()
 {
+    system("mode con cols=80 lines=24");
     system("color f1");
     hideCursor();
     start();
@@ -392,7 +393,6 @@ void switch_cus(int choice,char *name){
     }
 }
 void progressBar(char *text){
-    /*
     goToXY(26,21);
     printf(text);
     goToXY(19,19);
@@ -403,7 +403,6 @@ void progressBar(char *text){
         printf("%d%%",i*5);
         Sleep(100);
     }
-    */
 }
 void admin_login(){
     int state = 0;//0表示注册，1表示登陆
@@ -1916,7 +1915,6 @@ void buy_product(char *name){
     goToXY(20,6);
     printf("请输入您要搜索的商品编号：");
     scanf("%d",&buy_code);
-    progressBar("正在检索数据库，请稍候！");
 
     FILE *file = fopen(PRODUCT,"ab+");
     struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
