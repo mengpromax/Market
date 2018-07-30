@@ -55,13 +55,13 @@ struct user{
 };
 //保存用户的信息
 struct day_sold{
-    char date[10];
+    char date[15];
     int count;
 };
 
 
 void start();
-void goToXY();
+void goToXY(int x,int y);
 void drawBorder();
 void drawTitle();
 void admin_main(char *name);
@@ -2026,7 +2026,7 @@ void buy_product(char *name){
             strcpy(rec.name,name);
             strcpy(rec.product,comm.name);
             rec.quantity = buy_count;
-            char date[10];
+            char date[15];
             time_t timep;
             struct tm *p;
             time (&timep);
@@ -2545,7 +2545,7 @@ void sold_chart(char *name){
     system("cls");
     struct record rec = {"","",0,""};
     rewind(file);
-    char min_date[10] = "2020-12-30";
+    char min_date[15] = "2020-12-30";
 
     while(!feof(file)){
         int result = fread(&rec,sizeof(struct record),1,file);
@@ -2575,7 +2575,7 @@ void sold_chart(char *name){
         while(!feof(file)){
             int result = fread(&rec,sizeof(struct record),1,file);
             if(result == 1 && !strcmp(rec.date,date)){
-                count ++;
+                count +=rec.quantity;
             }
         }
         strcpy(ds.date,date);
@@ -2599,12 +2599,6 @@ void sold_chart(char *name){
             }
         }
 
-    }
-
-    for(k = 0;k < 10;k++){
-        ds.count = 30;
-        strcpy(ds.date,"2010-10-10");
-        fwrite(&ds,sizeof(struct day_sold),1,file_day);
     }
 
     fclose(file);
