@@ -75,7 +75,7 @@ void del_comm(char *name);
 void color_change(char *name);
 void send_mes(char *name);
 void receive_mes(char *name);
-int count_mes();//计算用户反馈信息的条数
+int count();//计算用户反馈信息的条数
 void show_page(char *file_name,char *str,char *name,int ver);
 void page_up(char *file_name,char *str,int num,char *name,int ver);
 void page_down(char *file_name,char *str,int num,char *name,int ver);
@@ -94,13 +94,14 @@ void sales_ranking_query(char *name,int ver);
 void buttom_title(int num);
 void del_pro(int del_num);
 double vault(double out_price,int number);
+void alert(char *name);
+
 
 
 int i,j,k;//定义循环变量
 int del_num;
 
-int main()
-{
+int main(){
     system("mode con cols=80 lines=24");
     system("color f1");
     hideCursor();
@@ -389,6 +390,8 @@ void switch_cus(int choice,char *name){
         case 12:
         	system("cls");
             start();
+            break;
+        default:
             break;
     }
 }
@@ -807,6 +810,7 @@ void admin_login_login(){
     system("cls");
     if(correct == 1){
         system("cls");
+        alert(login_name);
         admin_main(login_name);
     }else if(correct == 0){
         system("cls");
@@ -1045,15 +1049,35 @@ void receive_mes(char *name){
     show_page(MES,"用户反馈",name,1);
 
 }
-int count_mes(){
+int count(char *file_name){
     int count = 0;
-    FILE *file = fopen(MES,"ab+");
-    struct message mes = {"","","",""};
-    rewind(file);
-    while(!feof(file)){
-        int result = fread(&mes,sizeof(struct message),1,file);
-        if(result != 0){
-            count ++;
+    FILE *file = fopen(file_name,"ab+");
+    if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat") || !strcmp(file_name,"tmp_1.dat")){
+        struct commodity tmp = {0,"",0.0,0.0,"",0.0,"",0,""};
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&tmp,sizeof(struct commodity),1,file);
+            if(result != 0){
+                count ++;
+            }
+        }
+    }else if(!strcmp(file_name,MES)){
+        struct message tmp = {"","","",""};
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&tmp,sizeof(struct message),1,file);
+            if(result != 0){
+                count ++;
+            }
+        }
+    }else if(!strcmp(file_name,"tmp.dat")){
+        struct record tmp = {"","",0,""};
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&tmp,sizeof(struct record),1,file);
+            if(result != 0){
+                count ++;
+            }
         }
     }
     fclose(file);
@@ -1068,7 +1092,6 @@ void show_page(char *file_name,char *str,char *name,int ver){
     drawInBorder();
     buttom_title(page_num);
     FILE *file = fopen(file_name,"ab+");
-
     if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -1155,7 +1178,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
                     printf("%s",rec.product);
                     goToXY(49,4+3*i);
                     printf("%d",rec.quantity);
-                    goToXY(65,4+3*i);
+                    goToXY(64,4+3*i);
                     printf("%s",rec.date);
                 }else{
                     break;
@@ -1224,6 +1247,9 @@ void show_page(char *file_name,char *str,char *name,int ver){
             case 110://N键
                 state = 0;
                 page_num++;
+                if(page_num > count(file_name)/5){
+                    page_num = count(file_name)/5;
+                }
                 page_down(file_name,str,page_num,name,ver);
                 break;
             case 112://P键
@@ -1351,7 +1377,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",rec.product);
                     goToXY(49,4+3*i);
                     printf("%d",rec.quantity);
-                    goToXY(65,4+3*i);
+                    goToXY(64,4+3*i);
                     printf("%s",rec.date);
                 }else{
                     break;
@@ -1423,6 +1449,9 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
             case 110://N键
                 state = 0;
                 num++;
+                if(num > count(file_name)/5){
+                    num = count(file_name)/5;
+                }
                 page_down(file_name,str,num,name,ver);
                 break;
             case 112://P键
@@ -1551,7 +1580,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",rec.product);
                     goToXY(49,4+3*i);
                     printf("%d",rec.quantity);
-                    goToXY(65,4+3*i);
+                    goToXY(64,4+3*i);
                     printf("%s",rec.date);
                 }else{
                     break;
@@ -1621,6 +1650,9 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
             case 110://N键
                 state = 0;
                 num++;
+                if(num > count(file_name)/5){
+                    num = count(file_name)/5;
+                }
                 page_down(file_name,str,num,name,ver);
                 break;
             case 112://P键
@@ -1961,7 +1993,7 @@ void buy_product(char *name){
             fwrite(&comm,sizeof(struct commodity),1,file);
             fclose(file);
 
-            file = fopen(PRODUCT,"ab+");
+            file = fopen(BUY_RECORD,"ab+");
             struct record rec = {"","",0,""};
             strcpy(rec.name,name);
             strcpy(rec.product,comm.name);
@@ -2383,7 +2415,7 @@ void search_comm(char *name,int ver){
      }
      fclose(file);
      fclose(file_copy);
-     show_page("copy1.dat","商品信息",name,1);
+     show_page("copy1.dat","商品信息",name,ver);
 
 }
 void sales_ranking_query(char *name,int ver){
@@ -2452,4 +2484,26 @@ double vault(double out_price,int number){
     fwrite(&total,sizeof(double),1,file);
     fclose(file);
     return total;
+}
+void alert(char *name){
+    FILE *file = fopen(PRODUCT,"ab+");
+    FILE *file_copy = fopen("copy1.dat","w");
+    struct commodity comm = {0,"",0.0,0.0,"",0,"",0,""};
+    rewind(file);
+    int num = 0;
+    while(!feof(file)){
+        int result = fread(&comm,sizeof(struct commodity),1,file);
+        if(result != 0){
+            if(comm.count <= 3){
+                fwrite(&comm,sizeof(struct commodity),1,file_copy);
+                num = 1;
+            }
+        }
+    }
+    fclose(file);
+    fclose(file_copy);
+    if(num == 1)
+    {
+        show_page("copy1.dat","库存过低的商品",name,1);
+    }
 }
