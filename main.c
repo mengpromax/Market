@@ -15,6 +15,7 @@
 #define PRODUCT "product.dat"
 #define MES "mes.dat"
 #define BUY_RECORD "buy_record.dat"
+#define VAULT "vault.dat"
 
 struct message{
     char name[30];
@@ -90,7 +91,9 @@ void out_file(char *name,int ver);
 void info_change(char *name,int ver);
 void search_comm(char *name,int ver);
 void sales_ranking_query(char *name,int ver);
-
+void buttom_title(int num);
+void del_pro(int del_num);
+double vault(double out_price,int number);
 
 
 int i,j,k;//定义循环变量
@@ -219,6 +222,8 @@ void admin_main(char *name){
     drawBorder();
     goToXY(60,3);
     printf("欢迎您，%s!",name);
+    goToXY(55,4);
+    printf("超市的营业额为：%.1lf元",vault(0,0));
     goToXY(28,3);
     printf("****功能列表****");
     goToXY(29,5);
@@ -240,16 +245,13 @@ void admin_main(char *name){
     goToXY(29,13);
     printf("9.更新基本信息");
     goToXY(29,14);
-    printf("10.查询商品信息");
+    printf("10.更改界面颜色");
     goToXY(29,15);
-    printf("11.更改界面颜色");
+    printf("11.商品信息导出");
     goToXY(29,16);
-    printf("12.商品信息导出");
+    printf("12.注销账户");
     goToXY(29,17);
-    printf("13.注销账户");
-    goToXY(29,18);
-    printf("14.退出");
-
+    printf("13.退出");
     goToXY(25,20);
     printf("请输入您的选择：|");
     goToXY(45,20);
@@ -291,17 +293,15 @@ void switch_admin(int choice,char *name){
             info_change(name,1);
             break;
         case 10:
-            break;
-        case 11:
             color_change(name);
             break;
-        case 12:
+        case 11:
             out_file(name,1);
             break;
-        case 13:
+        case 12:
             admin_unsubscribe(name);
             break;
-        case 14:
+        case 13:
             system("cls");
             start();
             break;
@@ -566,7 +566,7 @@ void admin_register(){
            	admin.pass[i] = pw;
           	i++;
     	}
-      	pw = getch(); //继续输入字符ch
+      	pw = getch();
     }
     admin.pass[i]='\0';
     goToXY(31,16);
@@ -582,7 +582,7 @@ void admin_register(){
            	admin.pass_double[i] = pw;
          	 i++;
         }
-       	pw = getch(); //继续输入字符ch
+       	pw = getch();
     }
     admin.pass_double[i]='\0';
 
@@ -632,8 +632,8 @@ void admin_register(){
     else{
         system("cls");
         drawBorder();
-        goToXY(25,11);
-        printf("两次输入密码不一致，注册失败！");
+        goToXY(34,11);
+        printf("注册失败！");
         getch();
         system("cls");
         admin_login();
@@ -681,15 +681,15 @@ void cus_register(){
            	cus.pass[i] = pw;
           	i++;
         }
-       	pw = getch(); //继续输入字符ch
+       	pw = getch();
     }
     cus.pass[i]='\0';
     goToXY(31,16);
     i=0;
     pw=getch();
-    while( pw != 13) //输入字符ch不为Enter
+    while( pw != 13)
 	{
-		if(pw == 8)  //输入字符ch为BackSpace
+		if(pw == 8)
         {if(i!=0) {printf("%c %c",pw,pw);i--;}}
         else if(i==20&&pw!=8) {}
         else{
@@ -697,7 +697,7 @@ void cus_register(){
            	cus.pass_double[i] = pw;
           	i++;
         }
-       	pw = getch(); //继续输入字符ch
+       	pw = getch();
     }
     cus.pass_double[i]='\0';
 
@@ -901,6 +901,19 @@ void del_comm(char *name){
     goToXY(24,10);
     printf("请输入要删除的商品编号:");
     scanf("%d",&del_num);
+    del_pro(del_num);
+    progressBar("正在删除商品，请稍后！");
+    system("cls");
+    drawBorder();
+    goToXY(30,9);
+    printf("商品编号：%d",del_num);
+    goToXY(25,11);
+    printf("商品删除成功，按任意键继续！");
+    getch();
+    system("cls");
+    admin_main(name);
+}
+void del_pro(int del_num){
     FILE *file = fopen(PRODUCT,"ab+");
     FILE *file_copy = fopen("copy.dat","ab+");
     struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
@@ -917,16 +930,6 @@ void del_comm(char *name){
     fclose(file_copy);
     remove(PRODUCT);
     rename("copy.dat",PRODUCT);
-    progressBar("正在删除商品，请稍后！");
-    system("cls");
-    drawBorder();
-    goToXY(30,9);
-    printf("商品编号：%d",del_num);
-    goToXY(25,11);
-    printf("商品删除成功，按任意键继续！");
-    getch();
-    system("cls");
-    admin_main(name);
 }
 void color_change(char *name){
     int state = 0;
@@ -943,7 +946,7 @@ void color_change(char *name){
     goToXY(26,14);
     printf("④      绿底蓝字");
     goToXY(26,16);
-    printf("⑤      黄底紫字");
+    printf("⑤      黑底绿字");
     goToXY(26,18);
     printf("⑥      绿底白字");
     goToXY(26,20);
@@ -985,7 +988,7 @@ void color_change(char *name){
                     system("color 21");
                     break;
                 case 4:
-                    system("color 65");
+                    system("color 0A");
                     break;
                 case 5:
                     system("color 3f");
@@ -1064,6 +1067,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
+    buttom_title(page_num);
     FILE *file = fopen(file_name,"ab+");
 
     if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
@@ -1099,7 +1103,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
         }else if(ver == 2){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1109,6 +1113,8 @@ void show_page(char *file_name,char *str,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
+                    goToXY(48,4+3*i);
+                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
                     printf("%s",comm.provider);
                     goToXY(64,4+3*i);
@@ -1212,41 +1218,49 @@ void show_page(char *file_name,char *str,char *name,int ver){
     }
 
     fclose(file);
-    char choice = getch();
-    switch(choice){
-        case 110://N键
-            page_num++;
-            page_down(file_name,str,page_num,name,ver);
-            break;
-        case 112://P键
-            page_num--;
-            if(page_num < 0){
-                page_num = 0;
-            }
-            page_up(file_name,str,page_num,name,ver);
-            break;
-        case 27:
-            system("cls");
-            switch(ver){
-                case 1:
-                    admin_main(name);
-                    break;
-                case 2:
-                    cus_main(name);
-                    break;
-            }
-            break;
+    int state = 1;
+    int choice;
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                page_num++;
+                page_down(file_name,str,page_num,name,ver);
+                break;
+            case 112://P键
+                state = 0;
+                page_num--;
+                if(page_num < 0){
+                    page_num = 0;
+                }
+                page_up(file_name,str,page_num,name,ver);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                switch(ver){
+                    case 1:
+                        admin_main(name);
+                        break;
+                    case 2:
+                        cus_main(name);
+                        break;
+                }
+                break;
+            default:
+                choice = getch();
+        }
     }
 }
 void page_up(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
+    buttom_title(num);
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
     FILE *file = fopen(file_name,"ab+");
-
 
     if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
@@ -1283,7 +1297,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1293,6 +1307,8 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
+                    goToXY(48,4+3*i);
+                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
                     printf("%s",comm.provider);
                     goToXY(64,4+3*i);
@@ -1401,36 +1417,45 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
 
 
     fclose(file);
-    char choice = getch();
-    switch(choice){
-        case 110://N键
-            num++;
-            page_down(file_name,str,num,name,ver);
-            break;
-        case 112://P键
-            num--;
-            if(num < 0){
-                num = 0;
-            }
-            page_up(file_name,str,num,name,ver);
-            break;
-        case 27:
-            system("cls");
-            switch(ver){
-                case 1:
-                    admin_main(name);
-                    break;
-                case 2:
-                    cus_main(name);
-                    break;
-            }
-            break;
+    int state = 1;
+    int choice;
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                page_down(file_name,str,num,name,ver);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                page_up(file_name,str,num,name,ver);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                switch(ver){
+                    case 1:
+                        admin_main(name);
+                        break;
+                    case 2:
+                        cus_main(name);
+                        break;
+                }
+                break;
+            default:
+                choice = getch();
+        }
     }
 }
 void page_down(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
+    buttom_title(num);
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
@@ -1472,7 +1497,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t商品价格");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1482,6 +1507,8 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
+                    goToXY(48,4+3*i);
+                    printf("%d",comm.sold);
                     goToXY(56,4+3*i);
                     printf("%s",comm.provider);
                     goToXY(64,4+3*i);
@@ -1588,30 +1615,38 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
 
     }
     fclose(file);
-    char choice = getch();
-    switch(choice){
-        case 110://N键
-            num++;
-            page_down(file_name,str,num,name,ver);
-            break;
-        case 112://P键
-            num--;
-            if(num < 0){
-                num = 0;
-            }
-            page_up(file_name,str,num,name,ver);
-            break;
-        case 27:
-            system("cls");
-            switch(ver){
-                case 1:
-                    admin_main(name);
-                    break;
-                case 2:
-                    cus_main(name);
-                    break;
-            }
-            break;
+    int state = 1;
+    int choice;
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                page_down(file_name,str,num,name,ver);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                page_up(file_name,str,num,name,ver);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                switch(ver){
+                    case 1:
+                        admin_main(name);
+                        break;
+                    case 2:
+                        cus_main(name);
+                        break;
+                }
+                break;
+            default:
+                choice = getch();
+        }
     }
 }
 void drawInBorder(){
@@ -1628,7 +1663,6 @@ void drawInBorder(){
             printf("-");
         }
     }
-
 }
 void add_comm(char *name){
     system("cls");
@@ -1669,7 +1703,7 @@ void add_comm(char *name){
     goToXY(31,13);
     scanf("%s",comm.desc);
     goToXY(29,14);
-    scanf("%lf",&comm.count);
+    scanf("%d",&comm.count);
     goToXY(27,15);
     scanf("%s",comm.sort);
     goToXY(29,16);
@@ -1911,29 +1945,47 @@ void buy_product(char *name){
         goToXY(18,16);
         printf("请输入您要购买的商品件数：");
         scanf("%d",&buy_count);
-        progressBar("系统正在结算，请稍候！");
+        if(comm.count < buy_count){
+            system("cls");
+            drawBorder();
+            goToXY(23,11);
+            printf("选购商品库存不足，按联系管理员！");
+            getch();
+            system("cls");
+            cus_main(name);
+        }else{
+            progressBar("系统正在结算，请稍候！");
+            del_pro(buy_code);
+            FILE *file = fopen(PRODUCT,"ab+");
+            comm.sold += buy_count;
+            comm.count -= buy_count;
+            vault(comm.out_price,buy_count);
+            fwrite(&comm,sizeof(struct commodity),1,file);
+            fclose(file);
 
-        FILE *file = fopen(BUY_RECORD,"ab+");
-        struct record rec = {"","",0,""};
-        strcpy(rec.name,name);
-        strcpy(rec.product,comm.name);
-        rec.quantity = buy_count;
-        char date[10];
-        time_t timep;
-        struct tm *p;
-        time (&timep);
-        p=gmtime(&timep);
-        sprintf(date,"%d-%d-%d",p->tm_year + 1900,p->tm_mon + 1,p->tm_mday);
-        strcpy(rec.date,date);
-        fwrite(&rec,sizeof(struct record),1,file);
-        fclose(file);
-        system("cls");
-        drawBorder();
-        goToXY(25,11);
-        printf("选购商品已经购买成功，按任意键继续！");
-        getch();
-        system("cls");
-        cus_main(name);
+            file = fopen(PRODUCT,"ab+");
+            struct record rec = {"","",0,""};
+            strcpy(rec.name,name);
+            strcpy(rec.product,comm.name);
+            rec.quantity = buy_count;
+            char date[10];
+            time_t timep;
+            struct tm *p;
+            time (&timep);
+            p=gmtime(&timep);
+            sprintf(date,"%d-%d-%d",p->tm_year + 1900,p->tm_mon + 1,p->tm_mday);
+            strcpy(rec.date,date);
+            fwrite(&rec,sizeof(struct record),1,file);
+            fclose(file);
+
+            system("cls");
+            drawBorder();
+            goToXY(23,11);
+            printf("选购商品已经购买成功，按任意键继续！");
+            getch();
+            system("cls");
+            cus_main(name);
+        }
     }else if(state == 0){
         goToXY(18,8);
         printf("暂时未能搜索到你要查找的商品，请期待它的上架！");
@@ -2320,14 +2372,7 @@ void search_comm(char *name,int ver){
      scanf("%s",key);
      FILE *file = fopen(PRODUCT,"ab+");
      FILE *file_copy;
-     if(ver == 1)
-     {
-         file_copy = fopen("copy1.dat","w");
-     }
-     else if(ver == 2)
-     {
-         file_copy = fopen("copy2.dat","w");
-     }
+     file_copy = fopen("copy1.dat","w");
      struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
      rewind(file);
      while(!feof(file)){
@@ -2340,24 +2385,20 @@ void search_comm(char *name,int ver){
      }
      fclose(file);
      fclose(file_copy);
-     if(ver == 1)
-     {
-         show_page("copy1.dat","商品信息",name,1);
-     }
-     else if(ver == 2)
-     {
-         show_page("copy2.dat","商品信息",name,2);
-     }
+     show_page("copy1.dat","商品信息",name,1);
+
 }
 void sales_ranking_query(char *name,int ver){
     system("cls");
     drawBorder();
-    goToXY(23,5);
+    goToXY(23,3);
+    printf("****分类查询销量排序****");
+    goToXY(20,8);
     char view_sort[30];
     printf("输入您想查看的商品类别：");
     scanf("%s",view_sort);
     FILE *file =fopen("product.dat","ab+");
-    FILE *file_select=fopen("select.dat","ab+");
+
     struct commodity select_comm= {0,"",0,0,"",0,"",0,""};
     rewind(file);
     struct commodity product_select[1000];
@@ -2370,16 +2411,17 @@ void sales_ranking_query(char *name,int ver){
             if(strcmp(select_comm.sort,view_sort)==0)
             {
                 product_select[i]=select_comm;
-                fwrite(&select_comm,sizeof(struct commodity),1,file_select);
+
                 i++;
             }
         }
     }
+
     for(j=i-1; j>0; j--)
     {
         for(k=0; k<j; k++)
         {
-            if(product_select[k].sold>product_select[k+1].sold)
+            if(product_select[k].sold<product_select[k+1].sold)
             {
                 struct commodity tmp=product_select[k];
                 product_select[k]=product_select[k+1];
@@ -2388,7 +2430,7 @@ void sales_ranking_query(char *name,int ver){
         }
     }
     fclose(file);
-    file_select=fopen("select.dat","w");   //删除原来数据
+    FILE *file_select=fopen("select.dat","w");
     rewind(file_select);
     for(j=0; j<i; j++)
     {
@@ -2396,4 +2438,20 @@ void sales_ranking_query(char *name,int ver){
     }
     fclose(file_select);
 	show_page("select.dat","商品销量排序",name,ver);
+}
+void buttom_title(int num){
+    goToXY(6,21);
+    printf("【ESC】返回主界面\t【N】向后翻页\t【P】向前翻页\t当前页码：%d",num+1);
+}
+double vault(double out_price,int number){
+    double total;
+    FILE *file;
+    file = fopen(VAULT,"ab+");
+    fread(&total,sizeof(double),1,file);
+    fclose(file);
+    total = total + out_price*number;
+    file = fopen(VAULT,"w");
+    fwrite(&total,sizeof(double),1,file);
+    fclose(file);
+    return total;
 }
