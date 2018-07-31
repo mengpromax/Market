@@ -640,6 +640,7 @@ void admin_register(){
         }
         else
         {
+            fclose(file);
             system("cls");
             drawBorder();
             goToXY(25,11);
@@ -2317,6 +2318,7 @@ void info_change(char *name,int ver){
     }
     FILE *file_copy = fopen("copy.dat","ab+");
      struct user use = {"","","","","",""};
+     struct user User= {"","","","","",""};
      rewind(file);
      while(!feof(file)){
          int result = fread(&use,sizeof(struct user),1,file);
@@ -2377,7 +2379,6 @@ void info_change(char *name,int ver){
                                 FILE *file_info;
                                 file_info = fopen(USER_NOW,"ab+");
                                 rewind(file_info);
-                                struct user User= {"","","","","",""};
                                 while(!feof(file))
                                 {
                                     int result = fread(&User,sizeof(struct user),1,file);
@@ -2487,7 +2488,7 @@ void sales_ranking_query(char *name,int ver){
     scanf("%s",view_sort);
     FILE *file =fopen("product.dat","ab+");
 
-    struct commodity select_comm= {0,"",0,0,"",0,"",0,""};
+    struct commodity select_comm= {0,"",0.0,0.0,"",0.0,"",0,""};
     rewind(file);
     struct commodity product_select[1000];
     i=0;
@@ -2499,17 +2500,15 @@ void sales_ranking_query(char *name,int ver){
             if(strcmp(select_comm.sort,view_sort)==0)
             {
                 product_select[i]=select_comm;
-
                 i++;
             }
         }
     }
-
     for(j=i-1; j>0; j--)
     {
         for(k=0; k<j; k++)
         {
-            if(product_select[k].sold<product_select[k+1].sold)
+            if(product_select[k].sold < product_select[k+1].sold)
             {
                 struct commodity tmp=product_select[k];
                 product_select[k]=product_select[k+1];
@@ -2523,19 +2522,24 @@ void sales_ranking_query(char *name,int ver){
     for(j=0; j<i; j++)
     {
         fwrite(&product_select[j],sizeof(struct commodity),1,file_select);
+        printf("%s---%s---%d---%d\n",product_select[j].desc,product_select[j].provider,product_select[j].sold,product_select[j].count);
     }
     fclose(file_select);
-	show_page("select.dat","商品销量排序",name,ver);
+	show_page("select.dat","销量排序",name,ver);
 }
 void buttom_title(int num){
     goToXY(6,21);
     printf("【ESC】返回主界面\t【N】向后翻页\t【P】向前翻页\t当前页码：%d",num+1);
 }
 double vault(double out_price,int number){
-    double total;
+    double total = 0.0;
+    double total_tmp = 0.0;
     FILE *file;
     file = fopen(VAULT,"ab+");
-    fread(&total,sizeof(double),1,file);
+    int result = fread(&total_tmp,sizeof(double),1,file);
+    if(result == 1){
+    	total = total_tmp;
+	}
     fclose(file);
     total = total + out_price*number;
     file = fopen(VAULT,"w");
@@ -2583,7 +2587,7 @@ void sold_chart(char *name){
             strcpy(min_date,rec.date);
         }
     }
-    char max_date[10];
+    char max_date[15];
     time_t timep;
     struct tm *p;
     time (&timep);
@@ -2597,7 +2601,7 @@ void sold_chart(char *name){
     int month;
     int day;
     sscanf(min_date,"%d-%d-%d",&nouse_year,&month,&day);
-    char date[10];
+    char date[15];
     for(i = 0;i < days;i++){
         count = 0;
         sprintf(date,"%d-%d-%d",nouse_year,month,day);
@@ -2713,7 +2717,7 @@ void chart_up(int num,char *name,int days){
     for(i = 1;i <= 6;i++){
         int result = fread(&ds,sizeof(struct day_sold),1,file);
         if(result == 1){
-            char date[10];
+            char date[15];
             int month;
             int day;
             sscanf(ds.date,"%d-%d-%d",&k,&month,&day);
@@ -2773,7 +2777,7 @@ void chart_down(int num,char *name,int days){
     for(i = 1;i <= 6;i++){
         int result = fread(&ds,sizeof(struct day_sold),1,file);
         if(result == 1){
-            char date[10];
+            char date[15];
             int month;
             int day;
             sscanf(ds.date,"%d-%d-%d",&k,&month,&day);
