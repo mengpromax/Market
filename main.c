@@ -43,7 +43,7 @@ struct commodity{
     char sort[30];//类别
     int sold;//销售量
     char provider[50];//生产商
-} ;
+};
 //结构体数组
 struct user{
     char name[20];
@@ -107,6 +107,10 @@ void chart_up(int num,char *name,int days);
 void chart_down(int num,char *name,int days);
 int count_sold();
 void updown_bottom();
+void file_oi(char *name);
+void in_file(char *name);
+int ver_comm(struct commodity comm);
+
 
 
 int i,j,k;//定义循环变量
@@ -262,7 +266,7 @@ void admin_main(char *name){
     goToXY(29,15);
     printf("11.更改界面颜色");
     goToXY(29,16);
-    printf("12.商品信息导出");
+    printf("12.商品信息导出/导入");
     goToXY(29,17);
     printf("13.注销账户");
     goToXY(29,18);
@@ -314,7 +318,7 @@ void switch_admin(int choice,char *name){
             color_change(name);
             break;
         case 12:
-            out_file(name,1);
+            file_oi(name);
             break;
         case 13:
             admin_unsubscribe(name);
@@ -631,7 +635,7 @@ void admin_register(){
             drawBorder();
             goToXY(30,9);
             printf("用户名：%s",admin.name);
-            goToXY(25,11);
+            goToXY(24,11);
             printf("管理员身份注册成功，按任意键继续！");
             getch();
             system("cls");
@@ -744,7 +748,7 @@ void cus_register(){
             drawBorder();
             goToXY(30,9);
             printf("用户名：%s",cus.name);
-            goToXY(25,11);
+            goToXY(24,11);
             printf("顾客身份注册成功，按任意键继续！");
             getch();
             system("cls");
@@ -764,7 +768,6 @@ void cus_register(){
     else
     {
         system("cls");
-
         drawBorder();
         goToXY(25,11);
         printf("两次输入密码不一致，注册失败！");
@@ -2414,6 +2417,18 @@ void info_change(char *name,int ver){
                         }
                         goToXY(30,6+state*2);
                         printf("★");
+                    }else if(choice == 27){
+                        fclose(file);
+                        fclose(file_copy);
+                        system("cls");
+                        switch(ver){
+                            case 1:
+                                admin_main(name);
+                                break;
+                            case 2:
+                                cus_main(name);
+                                break;
+                        }
                     }
                     else if(choice == 80){
                         goToXY(30,6+state*2);
@@ -2916,6 +2931,134 @@ int count_days(char *min_date,char *max_date){
     return count;
 }
 void updown_bottom(){
-    goToXY(10,21);
-    printf("【ENTER】选择进入\t\t【↓】向下\t【↑】向上");
+    goToXY(7,21);
+    printf("【ENTER】选择进入\t【ESC】返回\t【↓】向下\t【↑】向上");
+}
+void file_oi(char *name){
+    int state = 0;
+    system("cls");
+    drawBorder();
+    goToXY(26,9);
+    printf("请选择导出或导入：");
+    goToXY(26,12);
+    printf("①  ★  信息导入");
+    goToXY(26,14);
+    printf("②      信息导出");
+    updown_bottom();
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80){
+
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    in_file(name);
+                    break;
+                case 1:
+                    system("cls");
+                    drawBorder();
+                    out_file(name,1);
+                    break;
+            }
+        }else if(choice == 27){
+            system("cls");
+            drawBorder();
+            admin_main(name);
+        }
+    }
+    getchar();
+}
+void in_file(char *name){
+    int count = 0;
+    system("cls");
+    drawBorder();
+    char file_in[30],str[150],*result,delims[] = "-",nouse[30];
+    goToXY(20,3);
+    printf("****在这里你可以将文件中的商品信息导入系统****");
+    goToXY(18,8);
+    printf("请输入文件夹中的商品信息文件：");
+    scanf("%s",&file_in);
+    system("copy product.dat pro.dat");
+    struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
+    FILE *file = fopen(file_in,"r");
+    FILE *file_pro = fopen(PRODUCT,"ab+");
+    while(fgets(str,150,file)!=NULL){
+        str[strlen(str) - 1] = '\0';
+		result = strtok( str, delims );
+		sscanf(result,"%10s%d",&nouse,&comm.num);
+		result = strtok( NULL, delims );
+		sscanf(result,"%10s%s",&nouse,&comm.name);
+		result = strtok( NULL, delims );
+		sscanf(result,"%10s%s",&nouse,&comm.desc);
+		result = strtok( NULL, delims );
+		sscanf(result,"%10s%s",&nouse,&comm.sort);
+		result = strtok( NULL, delims );
+		sscanf(result,"%12s%s",&nouse,&comm.provider);
+		result = strtok( NULL, delims );
+		sscanf(result,"%8s%d",&nouse,&comm.sold);
+		result = strtok( NULL, delims );
+		sscanf(result,"%8s%d",&nouse,&comm.count);
+		result = strtok( NULL, delims );
+		sscanf(result,"%6s%lf",&nouse,&comm.in_price);
+		result = strtok( NULL, delims );
+		sscanf(result,"%6s%lf",&nouse,&comm.out_price);
+
+		if(ver_comm(comm) == 0){
+            fwrite(&comm,sizeof(struct commodity),1,file_pro);
+            count ++;
+		}
+
+
+	}
+	fclose(file);
+	fclose(file_pro);
+    progressBar("正在将文件中的信息导入，请稍候！");
+    system("cls");
+    drawBorder();
+    if(count != 0){
+        goToXY(22,11);
+        printf("本次共导入%d条商品信息！按任意键继续！",count);
+    }else{
+        goToXY(22,10);
+        printf("抱歉！在您提供的文件中没有找到商品信息！");
+        goToXY(29,11);
+        printf("按任意键继续！");
+    }
+    getch();
+    system("cls");
+    admin_main(name);
+}
+int ver_comm(struct commodity comm){
+    int state = 0;
+    FILE *file = fopen("pro.dat","ab+");
+    struct commodity co = {0,"",0.0,0.0,"",0.0,"",0,""};
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&co,sizeof(struct commodity),1,file);
+        if(result == 1 && co.num == comm.num && !strcmp(co.name,comm.name) && !strcmp(co.desc,comm.desc)){
+            state = 1;
+            break;
+        }
+    }
+    return state;
 }
