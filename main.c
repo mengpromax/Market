@@ -106,7 +106,7 @@ void show_chart(char *name,int days);
 void chart_up(int num,char *name,int days);
 void chart_down(int num,char *name,int days);
 int count_sold();
-
+void updown_bottom();
 
 
 int i,j,k;//定义循环变量
@@ -131,7 +131,7 @@ void start(){
     printf("②      顾客");
     goToXY(26,16);
     printf("③      退出系统");
-
+    updown_bottom();
     while(TRUE){
         char choice;
         choice = getch();
@@ -437,7 +437,7 @@ void admin_login(){
     printf("②      管理员登陆");
     goToXY(26,16);
     printf("③      退出");
-
+    updown_bottom();
     while(TRUE){
         char choice;
         choice = getch();
@@ -495,8 +495,7 @@ void cus_login(){
     printf("②      顾客登陆");
     goToXY(26,16);
     printf("③      退出");
-
-
+    updown_bottom();
     while(TRUE){
         char choice;
         choice = getch();
@@ -1769,7 +1768,6 @@ void add_comm(char *name){
 
     int state_now = 0;
     FILE *file = fopen(PRODUCT,"ab+");
-    FILE *file_copy = fopen("copy.dat","ab+");
     struct commodity comm_1 = {0,"",0.0,0.0,"",0.0,"",0,""};
     rewind(file);
     while(!feof(file)){
@@ -1825,6 +1823,7 @@ void add_comm(char *name){
 }
 void change_comm(char *name){
     int change_num;
+    int state = 0;//表示是否修改成功
     system("cls");
     drawBorder();
     goToXY(28,3);
@@ -1843,6 +1842,7 @@ void change_comm(char *name){
                 fwrite(&comm,sizeof(struct commodity),1,file_copy);
             }
             if(comm.num == change_num){
+                state = 1;
                 system("cls");
                 int state = 0;
                 drawBorder();
@@ -1876,6 +1876,7 @@ void change_comm(char *name){
                 printf("⑦      生产商");
                 goToXY(50,18);
                 printf("当前：%s",comm.provider);
+                updown_bottom();
                 while(TRUE){
                     char choice;
                     choice = getch();
@@ -1899,8 +1900,11 @@ void change_comm(char *name){
                             goToXY(30,6+state*2);
                             printf("★");
                     }else if(choice == 27){
+                        fclose(file);
+                        fclose(file_copy);
                         system("cls");
                         admin_main(name);
+
                     }else if(choice == '\r'){
                         system("cls");
                         drawBorder();
@@ -1945,8 +1949,16 @@ void change_comm(char *name){
      drawBorder();
      goToXY(30,9);
      printf("商品编号：%d",change_num);
-     goToXY(25,11);
-     printf("商品修改成功，按任意键继续！");
+     switch(state){
+        case 0:
+            goToXY(22,11);
+            printf("您所输入的商品编号不存在！按任意键继续！");
+            break;
+        case 1:
+            goToXY(25,11);
+            printf("商品修改成功，按任意键继续！");
+            break;
+    }
      getch();
      system("cls");
 
@@ -1978,6 +1990,7 @@ void change_comm(char *name){
             case 0:
                 system("cls");
                 admin_main(name);
+                break;
          }
 }
 void buy_record(char *name){
@@ -2350,10 +2363,10 @@ void info_change(char *name,int ver){
      FILE *file;
      if(ver == 1){
         file = fopen(USER_1,"ab+");
-     }
-    else if(ver == 2){
+     }else if(ver == 2){
         file = fopen(USER_2,"ab+");
     }
+    remove("copy.dat");
     FILE *file_copy = fopen("copy.dat","ab+");
      struct user use = {"","","","","",""};
      struct user User= {"","","","","",""};
@@ -2372,23 +2385,23 @@ void info_change(char *name,int ver){
                 printf("请选择您要修改的信息：");
                 goToXY(26,6);
                 printf("①  ★  昵称");
-                goToXY(50,6);
+                goToXY(46,6);
                 printf("当前：%s",use.name);
                 goToXY(26,8);
                 printf("②      性别");
-                goToXY(50,8);
+                goToXY(46,8);
                 printf("当前：%s",use.sex);
                 goToXY(26,10);
                 printf("③      邮箱");
-                goToXY(50,10);
+                goToXY(46,10);
                 printf("当前：%s",use.mail);
                 goToXY(26,12);
                 printf("④      手机号");
-                goToXY(50,12);
+                goToXY(46,12);
                 printf("当前：%s",use.phone);
                 goToXY(26,14);
                 printf("⑤      密码");
-
+                updown_bottom();
                 while(TRUE){
                     char choice;
                     choice = getch();
@@ -2901,4 +2914,8 @@ int count_days(char *min_date,char *max_date){
     }
 
     return count;
+}
+void updown_bottom(){
+    goToXY(10,21);
+    printf("【ENTER】选择进入\t\t【↓】向下\t【↑】向上");
 }
