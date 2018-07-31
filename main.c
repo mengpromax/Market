@@ -235,7 +235,7 @@ void admin_main(char *name){
     drawBorder();
     goToXY(60,3);
     printf("欢迎您，%s!",name);
-    goToXY(55,4);
+    goToXY(23,22);
     printf("超市的营业额为：%.1lf元",vault(0,0));
     goToXY(28,3);
     printf("****功能列表****");
@@ -2368,9 +2368,39 @@ void info_change(char *name,int ver){
                         drawBorder();
                         goToXY(24,10);
                         printf("请输入你要修改的信息：");
+                        int state_1 = 1;
                         switch(state){
                             case 0:
                                 scanf("%s",use.name);
+                                char USER_NOW[30];
+                                sprintf(USER_NOW,"USER_%d",ver);
+                                FILE *file_info;
+                                file_info = fopen(USER_NOW,"ab+");
+                                rewind(file_info);
+                                struct user User= {"","","","","",""};
+                                while(!feof(file))
+                                {
+                                    int result = fread(&User,sizeof(struct user),1,file);
+                                    if(result != 0)
+                                    {
+                                        if(strcmp(User.name,use.name)==0){
+                                            state_1 = 0;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(state_1 == 0){
+                                    system("cls");
+                                    drawBorder();
+                                    goToXY(25,11);
+                                    printf("用户名重复，信息修改失败！");
+                                    getch();
+                                    system("cls");
+                                    info_change(name,ver);
+                                    cus_login();
+                                }
+
+
                                 break;
 
                             case 1:
