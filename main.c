@@ -1727,9 +1727,7 @@ void drawInBorder(){
 void add_comm(char *name){
     system("cls");
     drawBorder();
-
-    struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
-
+    struct commodity comm = {0,"",0.0,0.0,"",0,"",0,""};
     goToXY(28,3);
     printf("****请输入商品信息****");
     goToXY(20,9);
@@ -1750,8 +1748,6 @@ void add_comm(char *name){
     printf("销售量：");
     goToXY(20,17);
     printf("生产商：");
-
-
     goToXY(31,9);
     scanf("%d",&comm.num);
     goToXY(31,10);
@@ -1771,7 +1767,30 @@ void add_comm(char *name){
     goToXY(29,17);
     scanf("%s",comm.provider);
 
-    FILE *file;
+    int state_now = 0;
+    FILE *file = fopen(PRODUCT,"ab+");
+    FILE *file_copy = fopen("copy.dat","ab+");
+    struct commodity comm_1 = {0,"",0.0,0.0,"",0.0,"",0,""};
+    rewind(file);
+    while(!feof(file)){
+        int result = fread(&comm_1,sizeof(struct commodity),1,file);
+        if(result != 0){
+            if(comm.num == comm_1.num){
+                  state_now = 1;
+            }
+        }
+    }
+    fclose(file);
+    if(state_now == 1)
+    {
+        system("cls");
+        drawBorder();
+        goToXY(25,11);
+        printf("商品编号重复，按任意键继续！");
+        getch();
+        add_comm(name);
+    }
+
     file = fopen(PRODUCT,"ab+");
     fwrite(&comm,sizeof(struct commodity),1,file);
     fclose(file);
@@ -1786,11 +1805,13 @@ void add_comm(char *name){
         if(!strcmp(y_n,"Yes")){
             choice = 1;
             break;
-        }else if(!strcmp(y_n,"No")){
+        }
+        else if(!strcmp(y_n,"No")){
             choice = 0;
             break;
-        }else
-            printf("输入错误！");
+        }
+        else
+        printf("输入错误！");
     }
     switch(choice)
     {
