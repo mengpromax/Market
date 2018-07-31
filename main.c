@@ -96,7 +96,7 @@ void out_file(char *name,int ver);
 void info_change(char *name,int ver);
 void search_comm(char *name,int ver);
 void sales_ranking_query(char *name,int ver);
-void buttom_title(int num);
+void buttom_title(int num,int max_num);
 void del_pro(int del_num);
 double vault(double out_price,int number);
 void alert(char *name);
@@ -1120,7 +1120,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
-    buttom_title(page_num);
+    buttom_title(page_num,count(file_name)/5 + 1);
     FILE *file = fopen(file_name,"ab+");
     if(!strcmp(file_name,PRODUCT) || !strcmp(file_name,"copy1.dat") || !strcmp(file_name,"select.dat")){
         if(ver == 1){
@@ -1310,7 +1310,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
-    buttom_title(num);
+    buttom_title(num,count(file_name)/5 + 1);
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
@@ -1512,7 +1512,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
     int nums = 0;//检索
     system("cls");
     drawBorder();
-    buttom_title(num);
+    buttom_title(num,count(file_name)/5 + 1);
     goToXY(25,2);
     printf("****以下是查询到的%s****",str);
     drawInBorder();
@@ -1829,18 +1829,32 @@ void change_comm(char *name){
                 printf("请选择您要修改的信息：");
                 goToXY(26,6);
                 printf("①  ★  进价");
+                goToXY(50,6);
+                printf("当前：%.1lf",comm.in_price);
                 goToXY(26,8);
                 printf("②      售价");
+                goToXY(50,8);
+                printf("当前：%.1lf",comm.out_price);
                 goToXY(26,10);
                 printf("③      商品描述");
+                goToXY(50,10);
+                printf("当前：%s",comm.desc);
                 goToXY(26,12);
                 printf("④      库存");
+                goToXY(50,12);
+                printf("当前：%d",comm.count);
                 goToXY(26,14);
                 printf("⑤      类别");
+                goToXY(50,14);
+                printf("当前：%s",comm.sort);
                 goToXY(26,16);
                 printf("⑥      销售量");
+                goToXY(50,16);
+                printf("当前：%d",comm.sold);
                 goToXY(26,18);
                 printf("⑦      生产商");
+                goToXY(50,18);
+                printf("当前：%s",comm.provider);
                 while(TRUE){
                     char choice;
                     choice = getch();
@@ -1863,6 +1877,9 @@ void change_comm(char *name){
                             }
                             goToXY(30,6+state*2);
                             printf("★");
+                    }else if(choice == 27){
+                        system("cls");
+                        admin_main(name);
                     }else if(choice == '\r'){
                         system("cls");
                         drawBorder();
@@ -2334,12 +2351,20 @@ void info_change(char *name,int ver){
                 printf("请选择您要修改的信息：");
                 goToXY(26,6);
                 printf("①  ★  昵称");
+                goToXY(50,6);
+                printf("当前：%s",use.name);
                 goToXY(26,8);
                 printf("②      性别");
+                goToXY(50,8);
+                printf("当前：%s",use.sex);
                 goToXY(26,10);
                 printf("③      邮箱");
+                goToXY(50,10);
+                printf("当前：%s",use.mail);
                 goToXY(26,12);
                 printf("④      手机号");
+                goToXY(50,12);
+                printf("当前：%s",use.phone);
                 goToXY(26,14);
                 printf("⑤      密码");
 
@@ -2527,9 +2552,9 @@ void sales_ranking_query(char *name,int ver){
     fclose(file_select);
 	show_page("select.dat","销量排序",name,ver);
 }
-void buttom_title(int num){
+void buttom_title(int num,int max_num){
     goToXY(6,21);
-    printf("【ESC】返回主界面\t【N】向后翻页\t【P】向前翻页\t当前页码：%d",num+1);
+    printf("【ESC】返回主界面\t【N】向后翻页\t【P】向前翻页\t当前页码：%d/%d",num+1,max_num);
 }
 double vault(double out_price,int number){
     double total = 0.0;
@@ -2648,7 +2673,7 @@ int count_sold(){
 }
 void show_chart(char *name,int days){
     int page_num = 0;//记录当前的翻页数
-    buttom_title(page_num);
+    buttom_title(page_num,count(DAY_SOLD)/5 + 1);
 
     FILE *file = fopen(DAY_SOLD,"ab+");
     struct day_sold ds = {"",0};
@@ -2707,7 +2732,7 @@ void chart_up(int num,char *name,int days){
     system("cls");
     drawBorder();
     drawInBorder();
-    buttom_title(num);
+    buttom_title(num,count(DAY_SOLD)/5 + 1);
     goToXY(25,2);
     printf("****以下是最近%d天的日销量情况****",days);
     FILE *file = fopen(DAY_SOLD,"ab+");
@@ -2767,7 +2792,7 @@ void chart_down(int num,char *name,int days){
     system("cls");
     drawBorder();
     drawInBorder();
-    buttom_title(num);
+    buttom_title(num,count(DAY_SOLD)/5 + 1);
     goToXY(25,2);
     printf("****以下是最近%d天的日销量情况****",days);
     FILE *file = fopen(DAY_SOLD,"ab+");
