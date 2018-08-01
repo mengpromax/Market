@@ -59,6 +59,10 @@ struct day_sold{
     char date[15];
     int count;
 };
+struct file_name{
+    char file[50];
+};
+
 
 
 void start();
@@ -78,7 +82,7 @@ void hideCursor();
 void switch_admin(int choice,char *name);
 void switch_cus(int choice,char *name);
 void del_comm(char *name);
-void color_change(char *name);
+void color_change(char *name,int ver);
 void send_mes(char *name);
 void receive_mes(char *name);
 int count();//计算用户反馈信息的条数
@@ -116,7 +120,10 @@ void buttom_title2(int num,int max_num);
 void move_to_shopping_cart(char *name);
 void empty_cart(char *name);
 void del_cart(char *name);
-
+void file_down(char *name,int num);
+void file_up(char *name,int num);
+void file_now(char *name);
+void file_in_choose(char *name);
 
 
 
@@ -322,7 +329,7 @@ void switch_admin(int choice,char *name){
             sold_chart(name);
             break;
         case 11:
-            color_change(name);
+            color_change(name,1);
             break;
         case 12:
             file_oi(name);
@@ -333,6 +340,11 @@ void switch_admin(int choice,char *name){
         case 14:
             system("cls");
             start();
+            break;
+        default:
+            system("cls");
+            fflush(stdin);
+            admin_main(name);
             break;
     }
 }
@@ -406,7 +418,7 @@ void switch_cus(int choice,char *name){
             show_page(PRODUCT,"商品信息",name,2);
             break;
         case 9:
-            color_change(name);
+            color_change(name,2);
             break;
         case 10:
             out_file(name,2);
@@ -419,11 +431,17 @@ void switch_cus(int choice,char *name){
             start();
             break;
         default:
+            system("cls");
+            fflush(stdin);
+            cus_main(name);
             break;
     }
 }
 void progressBar(char *text){
-    /*
+    goToXY(1,21);
+    for(i = 0;i < 79;i++){
+        printf(" ");
+    }
     goToXY(26,21);
     printf(text);
     goToXY(19,19);
@@ -432,9 +450,8 @@ void progressBar(char *text){
         printf("▌");
         goToXY(69,19);
         printf("%d%%",i*5);
-        Sleep(100);
+        Sleep(70);
     }
-    */
 }
 void admin_login(){
     int state = 0;//0表示注册，1表示登陆
@@ -878,7 +895,7 @@ void admin_login_login(){
     }
     fclose(file);
 
-    //progressBar("系统正在验证您的登录信息，请稍候！");
+    progressBar("系统正在验证您的登录信息，请稍候！");
     system("cls");
     if(correct == 1){
         system("cls");
@@ -970,6 +987,7 @@ void hideCursor(){
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
 }
 void del_comm(char *name){
+    fflush(stdin);
     int del_num;
     system("cls");
     drawBorder();
@@ -998,6 +1016,7 @@ void del_comm(char *name){
     admin_main(name);
 }
 int del_pro(int del_num){
+    fflush(stdin);
     int state = 0;
     FILE *file = fopen(PRODUCT,"ab+");
     FILE *file_copy = fopen("copy.dat","ab+");
@@ -1019,7 +1038,7 @@ int del_pro(int del_num){
     rename("copy.dat",PRODUCT);
     return state;
 }
-void color_change(char *name){
+void color_change(char *name,int ver){
     int state = 0;
     system("cls");
     drawBorder();
@@ -1083,7 +1102,14 @@ void color_change(char *name){
                     break;
                 case 6:
                     system("cls");
-                    admin_main(name);
+                    switch(ver){
+                        case 1:
+                            admin_main(name);
+                            break;
+                        case 2:
+                            cus_main(name);
+                            break;
+                    }
                     break;
             }
         }
@@ -1091,6 +1117,7 @@ void color_change(char *name){
     getchar();
 }
 void send_mes(char *name){
+    fflush(stdin);
     struct message mes = {"","","",""};
     system("cls");
     drawBorder();
@@ -1174,6 +1201,15 @@ int count(char *file_name,char *name){
                 count ++;
             }
         }
+    }else if(!strcmp(file_name,"file_name.dat")){
+        struct file_name fn = {""};
+        rewind(file);
+        while(!feof(file)){
+            int result = fread(&fn,sizeof(struct file_name),1,file);
+            if(result != 0){
+                count ++;
+            }
+        }
     }
     fclose(file);
     return count;
@@ -1199,7 +1235,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
                         printf("%d",comm.num);
                         goToXY(15,4+3*i);
                         printf("%s",comm.name);
-                        goToXY(25,4+3*i);
+                        goToXY(24,4+3*i);
                         printf("%s",comm.desc);
                         goToXY(33,4+3*i);
                         printf("%s",comm.sort);
@@ -1380,6 +1416,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -1405,7 +1442,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                         printf("%d",comm.num);
                         goToXY(15,4+3*i);
                         printf("%s",comm.name);
-                        goToXY(25,4+3*i);
+                        goToXY(24,4+3*i);
                         printf("%s",comm.desc);
                         goToXY(33,4+3*i);
                         printf("%s",comm.sort);
@@ -1551,7 +1588,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
     }
     fclose(file);
     int state = 1;
-    int choice;
+    int choice = 0;
     while(state){
         switch(choice){
             case 110://N键
@@ -1591,6 +1628,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -1617,7 +1655,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                         printf("%d",comm.num);
                         goToXY(15,4+3*i);
                         printf("%s",comm.name);
-                        goToXY(25,4+3*i);
+                        goToXY(24,4+3*i);
                         printf("%s",comm.desc);
                         goToXY(33,4+3*i);
                         printf("%s",comm.sort);
@@ -1803,6 +1841,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -1822,6 +1861,7 @@ void drawInBorder(){
     }
 }
 void add_comm(char *name){
+    fflush(stdin);
     system("cls");
     drawBorder();
     struct commodity comm = {0,"",0.0,0.0,"",0,"",0,""};
@@ -1924,36 +1964,57 @@ void add_comm(char *name){
     file = fopen(PRODUCT,"ab+");
     fwrite(&comm,sizeof(struct commodity),1,file);
     fclose(file);
-    int choice;
+
+    int state = 0;
+    system("cls");
+    drawBorder();
+    drawTitle();
+    goToXY(24,9);
+    printf("是否继续添加商品：");
+    goToXY(26,12);
+    printf("①  ★  是");
+    goToXY(26,14);
+    printf("②      否");
+    updown_bottom();
     while(TRUE){
-        system("cls");
-        drawBorder();
-        goToXY(20,9);
-        printf("是否继续添加商品？请输入Yes/No:");
-        char y_n[4];
-        gets(y_n);
-        if(!strcmp(y_n,"Yes")){
-            choice = 1;
-            break;
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 1;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
         }
-        else if(!strcmp(y_n,"No")){
-            choice = 0;
-            break;
-        }
-        else
-        printf("输入错误！");
-    }
-    switch(choice)
-    {
-        case 1:
-            add_comm(name);
-            break;
-        case 0:
-            system("cls");
+        else if(choice == 80){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    add_comm(name);
+                    break;
+
+                case 1:
+                    system("cls");
             admin_main(name);
+                    break;
+            }
+        }
     }
+    getchar();
 }
 void change_comm(char *name){
+    fflush(stdin);
     int change_num;
     int state_1 = 0;//表示是否修改成功
     system("cls");
@@ -2094,38 +2155,56 @@ void change_comm(char *name){
      getch();
      system("cls");
 
-     int choice;
-     while(TRUE){
-         system("cls");
-         drawBorder();
-         goToXY(20,9);
-         printf("是否继续修改商品信息？请输入Yes/No:");
-         char y_n[4];
-         gets(y_n);
-         if(!strcmp(y_n,"Yes")){
-                choice = 1;
-                break;
-         }
-         else if(!strcmp(y_n,"No")){
-                choice = 0;
-                break;
-         }
-         else
-            printf("输入错误！");
-         }
-         switch(choice)
-         {
-            case 1:
-                change_comm(name);
-                break;
+    int state = 0;
+    system("cls");
+    drawBorder();
+    drawTitle();
+    goToXY(24,9);
+    printf("是否继续修改商品：");
+    goToXY(26,12);
+    printf("①  ★  是");
+    goToXY(26,14);
+    printf("②      否");
+    updown_bottom();
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 1;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    change_comm(name);
+                    break;
 
-            case 0:
-                system("cls");
-                admin_main(name);
-                break;
-         }
+                case 1:
+                    system("cls");
+                    admin_main(name);
+                    break;
+            }
+        }
+    }
+    getchar();
 }
 void buy_record(char *name){
+    fflush(stdin);
     system("cls");
     drawBorder();
     remove("tmp.dat");
@@ -2149,6 +2228,7 @@ void buy_record(char *name){
     show_page("tmp.dat","购买记录",name,2);
 }
 void buy_product(char *name){
+    fflush(stdin);
     int state = 0;//表示查询商品时的状态
     system("cls");
     drawBorder();
@@ -2294,6 +2374,7 @@ void buy_product(char *name){
     }
 }
 void sort_search(char *name,int ver){
+    fflush(stdin);
     remove("tmp_1.dat");
     int state = 0;
     system("cls");
@@ -2569,7 +2650,7 @@ void info_change(char *name,int ver){
              if(strcmp(use.name,name)){
                 fwrite(&use,sizeof(struct user),1,file_copy);
              }
-             if(!strcmp(use.name,name)){
+             else if(!strcmp(use.name,name)){
                 system("cls");
                 int state = 0;
                 drawBorder();
@@ -2638,13 +2719,20 @@ void info_change(char *name,int ver){
                             case 0:
                                 scanf("%s",use.name);
                                 char USER_NOW[30];
-                                sprintf(USER_NOW,"USER_%d",ver);
+                                switch(ver){
+                                    case 1:
+                                        strcpy(USER_NOW,USER_1);
+                                        break;
+                                    case 2:
+                                        strcpy(USER_NOW,USER_2);
+                                        break;
+                                }
                                 FILE *file_info;
                                 file_info = fopen(USER_NOW,"ab+");
                                 rewind(file_info);
-                                while(!feof(file))
+                                while(!feof(file_info))
                                 {
-                                    int result = fread(&User,sizeof(struct user),1,file);
+                                    int result = fread(&User,sizeof(struct user),1,file_info);
                                     if(result != 0)
                                     {
                                         if(strcmp(User.name,use.name)==0){
@@ -2653,24 +2741,23 @@ void info_change(char *name,int ver){
                                         }
                                     }
                                 }
+                                fclose(file_info);
                                 if(state_1 == 0){
                                     system("cls");
                                     drawBorder();
                                     goToXY(25,11);
                                     printf("用户名重复，信息修改失败！");
+                                    fclose(file_copy);
+                                    fclose(file);
                                     getch();
                                     system("cls");
                                     info_change(name,ver);
                                     cus_login();
                                 }
-
-
                                 break;
-
                             case 1:
                                 scanf("%s",use.sex);
                                 break;
-
                             case 2:
                                 scanf("%s",use.mail);
                                 break;
@@ -2678,7 +2765,6 @@ void info_change(char *name,int ver){
                             case 3:
                                 scanf("%s",use.phone);
                                 break;
-
                             case 4:
                                 scanf("%s",use.pass);
                                 strcpy(use.pass_double,use.pass);
@@ -2714,6 +2800,7 @@ void info_change(char *name,int ver){
         cus_login_login();
 }
 void search_comm(char *name,int ver){
+     fflush(stdin);
      system("cls");
      drawBorder();
      goToXY(28,3);
@@ -2746,6 +2833,7 @@ void search_comm(char *name,int ver){
 
 }
 void sales_ranking_query(char *name,int ver){
+    fflush(stdin);
     system("cls");
     drawBorder();
     goToXY(23,3);
@@ -2936,9 +3024,11 @@ void show_chart(char *name,int days){
             sprintf(date,"%d-%d",month,day);
             goToXY(4,1+3*i);
             printf("%s: ",date);
-            goToXY(10,1+3*i);
-            for(j = 0;j < ds.count/5 + 1;j++){
-                printf("▌");
+            if(ds.count != 0){
+                goToXY(10,1+3*i);
+                for(j = 0;j < ds.count/5 + 1;j++){
+                    printf("▌");
+                }
             }
             goToXY(70,1+3*i);
             printf("%d件",ds.count);
@@ -2973,6 +3063,7 @@ void show_chart(char *name,int days){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -2997,9 +3088,11 @@ void chart_up(int num,char *name,int days){
             sprintf(date,"%d-%d",month,day);
             goToXY(4,1+3*i);
             printf("%s: ",date);
-            goToXY(10,1+3*i);
-            for(j = 0;j < ds.count/5 + 1;j++){
-                printf("▌");
+            if(ds.count != 0){
+                goToXY(10,1+3*i);
+                for(j = 0;j < ds.count/5 + 1;j++){
+                    printf("▌");
+                }
             }
             goToXY(70,1+3*i);
             printf("%d件",ds.count);
@@ -3033,6 +3126,7 @@ void chart_up(int num,char *name,int days){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -3058,8 +3152,11 @@ void chart_down(int num,char *name,int days){
             goToXY(4,1+3*i);
             printf("%s: ",date);
             goToXY(10,1+3*i);
-            for(j = 0;j < ds.count/5 + 1;j++){
-                printf("▌");
+            if(ds.count != 0){
+                goToXY(10,1+3*i);
+                for(j = 0;j < ds.count/5 + 1;j++){
+                    printf("▌");
+                }
             }
             goToXY(70,1+3*i);
             printf("%d件",ds.count);
@@ -3093,6 +3190,7 @@ void chart_down(int num,char *name,int days){
                 break;
             default:
                 choice = getch();
+                break;
         }
     }
 }
@@ -3172,7 +3270,7 @@ void file_oi(char *name){
         }else if(choice == '\r'){
             switch(state){
                 case 0:
-                    in_file(name);
+                    file_in_choose(name);
                     break;
                 case 1:
                     system("cls");
@@ -3188,7 +3286,60 @@ void file_oi(char *name){
     }
     getchar();
 }
+void file_in_choose(char *name){
+    int state = 0;
+    system("cls");
+    drawBorder();
+    goToXY(26,9);
+    printf("请选择操作：");
+    goToXY(26,12);
+    printf("①  ★  查看当前文件夹文件");
+    goToXY(26,14);
+    printf("②      输入文件名导入");
+    updown_bottom();
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80){
+
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    file_now(name);
+                    break;
+                case 1:
+                    in_file(name);
+                    break;
+            }
+        }else if(choice == 27){
+            system("cls");
+            drawBorder();
+            file_oi(name);
+        }
+    }
+    getchar();
+}
 void in_file(char *name){
+    fflush(stdin);
     int count = 0;
     system("cls");
     drawBorder();
@@ -3202,7 +3353,7 @@ void in_file(char *name){
         goToXY(48,8);
         gets(file_in);
     }
-    system("copy product.dat pro.dat");
+    system("copy product.dat pro.dat > NULL");
     struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
     FILE *file = fopen(file_in,"r");
     FILE *file_pro = fopen(PRODUCT,"ab+");
@@ -3276,8 +3427,8 @@ void buttom_title2(int num,int max_num){
     printf("【ESC】返回主界面\t【N】向后翻页\t【P】向前翻页\t当前页码：%d/%d",num+1,max_num);
 
 }
-void move_to_shopping_cart(char *name)
-{
+void move_to_shopping_cart(char *name){
+    fflush(stdin);
     goToXY(7,22);
     int select_num,select_count;
     printf("请输入想加入购物车的商品编号:");
@@ -3303,7 +3454,8 @@ void move_to_shopping_cart(char *name)
     if(j)
     {
         system("cls");
-        goToXY(28,9);
+        drawBorder();
+        goToXY(25,9);
         printf("没有此商品！");
         system("pause");
         system("cls");
@@ -3377,8 +3529,7 @@ void move_to_shopping_cart(char *name)
 
 
 }
-void empty_cart(char *name)
-{
+void empty_cart(char *name){
     int state=0;
 
     FILE *buy_file=fopen(name,"ab+");
@@ -3488,8 +3639,9 @@ void empty_cart(char *name)
         cus_main(name);
     }
 }
-void del_cart(char *name)
-{   goToXY(6,22);
+void del_cart(char *name){
+    fflush(stdin);
+    goToXY(6,22);
     int del_num,del_count;
     printf("请输入想删除的商品编号：");
     scanf("%d",&del_num);
@@ -3573,10 +3725,195 @@ void del_cart(char *name)
             rename("name_cop.dat",name);
         }
         system("cls");
-        goToXY(27,9);
+        drawBorder();
+        goToXY(25,9);
         printf("删除成功！");
         system("pause");
         system("cls");
         cus_main(name);
+    }
+}
+void file_now(char *name){
+    int page_num = 0;
+    char str[100],*result,delims[] = " ",tmp[100];
+    system("dir > file_name_tmp.txt");
+    FILE *file_tmp = fopen("file_name_tmp.txt","ab+");
+    remove("file_name.dat");
+    FILE *file = fopen("file_name.dat","ab+");
+    struct file_name fn = {""};
+    while(fgets(str,100,file_tmp)){
+        str[strlen(str) - 1] = '\0';
+        result = strtok(str,delims);
+        for(i = 0;i < 3;i++){
+            result = strtok(NULL,delims);
+        }
+        sprintf(tmp,"%s\n",result);
+        tmp[strlen(tmp) - 1] = '\0';
+        strcpy(fn.file,tmp);
+        printf("%s",fn.file);
+        fwrite(&fn,sizeof(struct file_name),1,file);
+    }
+    fclose(file_tmp);
+    remove("file_name_tmp.txt");
+    fclose(file);
+    remove("tmp.dat");
+    FILE *file_tmp_tmp = fopen("tmp.dat","ab+");
+    file = fopen("file_name.dat","ab+");
+    int fn_count = count("file_name.dat","") - 2;
+    rewind(file);
+    for(i = 0;i < fn_count;i++){
+        fread(&fn,sizeof(struct file_name),1,file);
+        fwrite(&fn,sizeof(struct file_name),1,file_tmp_tmp);
+    }
+    fclose(file);
+    fclose(file_tmp_tmp);
+    remove("file_name.dat");
+    rename("tmp.dat","file_name.dat");
+    system("cls");
+    drawBorder();
+    drawInBorder();
+    goToXY(25,2);
+    printf("****该文件夹下共有%d个文件！****",count("file_name.dat","") - 7);
+    drawInBorder();
+    file = fopen("file_name.dat","ab+");
+    buttom_title(page_num,(count("file_name.dat","") - 7) / 6 + 1);
+    fseek(file,sizeof(struct file_name) * 7,SEEK_SET);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&fn,sizeof(struct file_name),1,file);
+        if(result == 1){
+            goToXY(30,1+3*i);
+            printf("%s",fn.file);
+        }
+    }
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                page_num++;
+                if(page_num > (count("file_name.dat","") - 7)/6){
+                    page_num = (count("file_name.dat","") - 7)/6;
+                }
+                file_down(name,page_num);
+                break;
+            case 112://P键
+                state = 0;
+                page_num--;
+                if(page_num < 0){
+                    page_num = 0;
+                }
+                file_up(name,page_num);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                file_in_choose(name);
+                break;
+            default:
+                choice = getch();
+                break;
+        }
+    }
+}
+void file_up(char *name,int num){
+    system("cls");
+    drawBorder();
+    drawInBorder();
+    goToXY(25,2);
+    printf("****该文件夹下共有%d个文件！****",count("file_name.dat","") - 7);
+    drawInBorder();
+    FILE *file = fopen("file_name.dat","ab+");
+    struct file_name fn ={""};
+    buttom_title(num,(count("file_name.dat","") - 7) / 6 + 1);
+    fseek(file,sizeof(struct file_name) * (7 + 6 * num),SEEK_SET);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&fn,sizeof(struct file_name),1,file);
+        if(result == 1){
+            goToXY(30,1+3*i);
+            printf("%s",fn.file);
+        }
+    }
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                if(num > (count("file_name.dat","") - 7)/6){
+                    num = (count("file_name.dat","") - 7)/6;
+                }
+                file_down(name,num);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                file_up(name,num);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                file_in_choose(name);
+                break;
+            default:
+                choice = getch();
+                break;
+        }
+    }
+}
+void file_down(char *name,int num){
+    system("cls");
+    drawBorder();
+    drawInBorder();
+    goToXY(25,2);
+    printf("****该文件夹下共有%d个文件！****",count("file_name.dat","") - 7);
+    drawInBorder();
+    FILE *file = fopen("file_name.dat","ab+");
+    struct file_name fn ={""};
+    buttom_title(num,(count("file_name.dat","") - 7) / 6 + 1);
+    fseek(file,sizeof(struct file_name) * (7 + 6 * num),SEEK_SET);
+    for(i = 1;i <= 6;i++){
+        int result = fread(&fn,sizeof(struct file_name),1,file);
+        if(result == 1){
+            goToXY(30,1+3*i);
+            printf("%s",fn.file);
+        }
+    }
+    fclose(file);
+    int state = 1;
+    int choice = getch();
+    while(state){
+        switch(choice){
+            case 110://N键
+                state = 0;
+                num++;
+                if(num > (count("file_name.dat","") - 7)/6){
+                    num = (count("file_name.dat","") - 7)/6;
+                }
+                file_down(name,num);
+                break;
+            case 112://P键
+                state = 0;
+                num--;
+                if(num < 0){
+                    num = 0;
+                }
+                file_up(name,num);
+                break;
+            case 27:
+                state = 0;
+                system("cls");
+                file_in_choose(name);
+                break;
+            default:
+                choice = getch();
+                break;
+        }
     }
 }
