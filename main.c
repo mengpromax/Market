@@ -64,7 +64,6 @@ struct file_name{
 };
 
 
-
 void start();
 void goToXY(int x,int y);
 void drawBorder();
@@ -124,6 +123,8 @@ void file_down(char *name,int num);
 void file_up(char *name,int num);
 void file_now(char *name);
 void file_in_choose(char *name);
+
+
 
 
 
@@ -438,7 +439,7 @@ void switch_cus(int choice,char *name){
     }
 }
 void progressBar(char *text){
-    goToXY(1,21);
+    /*goToXY(1,21);
     for(i = 0;i < 79;i++){
         printf(" ");
     }
@@ -451,7 +452,7 @@ void progressBar(char *text){
         goToXY(69,19);
         printf("%d%%",i*5);
         Sleep(70);
-    }
+    }*/
 }
 void admin_login(){
     int state = 0;//0表示注册，1表示登陆
@@ -1257,7 +1258,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,"",0};
             goToXY(6,4);
             printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t价格");
-            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");}
+            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");} else{printf("  库存");}
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1274,9 +1275,12 @@ void show_page(char *file_name,char *str,char *name,int ver){
                     goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                     if(!strcmp(file_name,name)){
-                        goToXY(72,4+3*i);
+                        goToXY(71,4+3*i);
                         printf("%d",comm.cart_count);
                     }
+                    else {goToXY(71,4+3*i);
+                         printf("%d",comm.count);
+                         }
                 }else{
                     break;
                 }
@@ -1353,7 +1357,7 @@ void show_page(char *file_name,char *str,char *name,int ver){
         }else if(ver == 2){
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t  生产商  商品价格  库存");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1363,10 +1367,12 @@ void show_page(char *file_name,char *str,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(56,4+3*i);
+                    goToXY(52,4+3*i);
                     printf("%s",comm.provider);
-                    goToXY(64,4+3*i);
+                    goToXY(60,4+3*i);
                     printf("%.1lf",comm.out_price);
+                    goToXY(68,4+3*i);
+                    printf("%d",comm.count);
                 }else{
                     break;
                 }
@@ -1464,8 +1470,8 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t商品价格");
-            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");}
+            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t价格");
+            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");} else{printf("  库存");}
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1482,9 +1488,12 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                     goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                     if(!strcmp(file_name,name)){
-                        goToXY(72,4+3*i);
+                        goToXY(71,4+3*i);
                         printf("%d",comm.cart_count);
-                    }
+
+                    } else {goToXY(71,4+3*i);
+                         printf("%d",comm.count);
+                         }
                 }else{
                     break;
                 }
@@ -1565,7 +1574,7 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t  生产商  商品价格  库存");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1575,10 +1584,12 @@ void page_up(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(56,4+3*i);
+                    goToXY(52,4+3*i);
                     printf("%s",comm.provider);
-                    goToXY(64,4+3*i);
+                    goToXY(60,4+3*i);
                     printf("%.1lf",comm.out_price);
+                    goToXY(68,4+3*i);
+                    printf("%d",comm.count);
                 }else{
                     break;
                 }
@@ -1677,8 +1688,8 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t商品价格");
-            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");}
+            printf("商品编号\t商品名称\t商品描述\t销量\t生产商\t价格");
+            if(!strcmp(file_name,name)) {printf("  数量"); goToXY(52,22);printf("【S】删除");} else{printf("  库存");}
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1695,9 +1706,12 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                     goToXY(64,4+3*i);
                     printf("%.1lf",comm.out_price);
                     if(!strcmp(file_name,name)){
-                        goToXY(72,4+3*i);
+                        goToXY(71,4+3*i);
                         printf("%d",comm.cart_count);
-                    }
+
+                         }
+                    else {goToXY(71,4+3*i);
+                         printf("%d",comm.count);}
                 }else{
                     break;
                 }
@@ -1778,7 +1792,7 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
             fseek(file,sizeof(struct commodity)*5*num,SEEK_SET);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
             goToXY(6,4);
-            printf("商品编号\t商品名称\t商品描述\t\t生产商\t商品价格");
+            printf("商品编号\t商品名称\t商品描述\t  生产商  商品价格  库存");
             for(i = 1;i < 6;i ++){
                 int result = fread(&comm,sizeof(struct commodity),1,file);
                 if(result == 1){
@@ -1788,10 +1802,12 @@ void page_down(char *file_name,char *str,int num,char *name,int ver){
                     printf("%s",comm.name);
                     goToXY(32,4+3*i);
                     printf("%s",comm.desc);
-                    goToXY(56,4+3*i);
+                    goToXY(52,4+3*i);
                     printf("%s",comm.provider);
-                    goToXY(64,4+3*i);
+                    goToXY(60,4+3*i);
                     printf("%.1lf",comm.out_price);
+                    goToXY(68,4+3*i);
+                    printf("%d",comm.count);
                 }else{
                     break;
                 }
@@ -2847,9 +2863,9 @@ void sales_ranking_query(char *name,int ver){
         goToXY(44,8);
         gets(view_sort);
     }
-    FILE *file =fopen("product.dat","ab+");
+    FILE *file =fopen(PRODUCT,"ab+");
 
-    struct commodity select_comm= {0,"",0.0,0.0,"",0.0,"",0,""};
+    struct commodity select_comm= {0,"",0.0,0.0,"",0,"",0,"",0};
     rewind(file);
     struct commodity product_select[1000];
     i=0;
@@ -2865,6 +2881,7 @@ void sales_ranking_query(char *name,int ver){
             }
         }
     }
+    fclose(file);
     for(j=i-1; j>0; j--)
     {
         for(k=0; k<j; k++)
@@ -2877,13 +2894,13 @@ void sales_ranking_query(char *name,int ver){
             }
         }
     }
-    fclose(file);
+
     FILE *file_select=fopen("select.dat","w");
     rewind(file_select);
     for(j=0; j<i; j++)
     {
         fwrite(&product_select[j],sizeof(struct commodity),1,file_select);
-        printf("%s---%s---%d---%d\n",product_select[j].desc,product_select[j].provider,product_select[j].sold,product_select[j].count);
+       // printf("%s---%s---%d---%d\n",product_select[j].desc,product_select[j].provider,product_select[j].sold,product_select[j].count);
     }
     fclose(file_select);
 	show_page("select.dat","销量排序",name,ver);
@@ -3270,7 +3287,7 @@ void file_oi(char *name){
         }else if(choice == '\r'){
             switch(state){
                 case 0:
-                    file_in_choose(name);
+                    in_file(name);
                     break;
                 case 1:
                     system("cls");
@@ -3282,58 +3299,6 @@ void file_oi(char *name){
             system("cls");
             drawBorder();
             admin_main(name);
-        }
-    }
-    getchar();
-}
-void file_in_choose(char *name){
-    int state = 0;
-    system("cls");
-    drawBorder();
-    goToXY(26,9);
-    printf("请选择操作：");
-    goToXY(26,12);
-    printf("①  ★  查看当前文件夹文件");
-    goToXY(26,14);
-    printf("②      输入文件名导入");
-    updown_bottom();
-    while(TRUE){
-        char choice;
-        choice = getch();
-        if(choice == 72){
-            goToXY(30,12+state*2);
-            printf("\b  ");
-            state -= 1;
-            if(state == -1){
-                state = 2;
-            }
-            goToXY(30,12+state*2);
-            printf("★");
-        }
-        else if(choice == 80){
-
-            goToXY(30,12+state*2);
-            printf("\b  ");
-            state += 1;
-            if(state == 2){
-                state = 0;
-            }
-            goToXY(30,12+state*2);
-            printf("★");
-
-        }else if(choice == '\r'){
-            switch(state){
-                case 0:
-                    file_now(name);
-                    break;
-                case 1:
-                    in_file(name);
-                    break;
-            }
-        }else if(choice == 27){
-            system("cls");
-            drawBorder();
-            file_oi(name);
         }
     }
     getchar();
@@ -3353,7 +3318,7 @@ void in_file(char *name){
         goToXY(48,8);
         gets(file_in);
     }
-    system("copy product.dat pro.dat > NULL");
+    system("copy product.dat pro.dat");
     struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,""};
     FILE *file = fopen(file_in,"r");
     FILE *file_pro = fopen(PRODUCT,"ab+");
@@ -3491,7 +3456,7 @@ void move_to_shopping_cart(char *name){
             test_comm.cart_count+=select_count;
 
 
-            FILE *file_move = fopen("cop.dat","ab+");
+            FILE *file_move = fopen("cop","ab+");
             rewind(file_cart);
             rewind(file_move);
             struct commodity comm = {0,"",0.0,0.0,"",0.0,"",0,"",0};
@@ -3514,7 +3479,7 @@ void move_to_shopping_cart(char *name){
             fclose(file_cart);
             fclose(file_move);
             remove(name);
-            rename("cop.dat",name);
+            rename("cop",name);
 
         }
 
@@ -3560,6 +3525,7 @@ void empty_cart(char *name){
                 if(comm.count < buy_comm.cart_count)      //判断是否有货
                 {
                     j=0;
+                    fclose(buy_file);
                     system("cls");
                     drawBorder();
                     goToXY(23,11);
@@ -3571,6 +3537,7 @@ void empty_cart(char *name){
             }
         }
     }
+
     state=0;
     if(j==0)
     {
@@ -3646,7 +3613,6 @@ void del_cart(char *name){
     printf("请输入想删除的商品编号：");
     scanf("%d",&del_num);
     FILE *file=fopen(name,"ab+");
-    FILE *file_cart_del=fopen("name_cop.dat","ab+");
     struct commodity comm= {0,"",0,0,"",0,"",0,"",0};
     struct commodity comm_move= {0,"",0,0,"",0,"",0,"",0};
     rewind(file);
@@ -3663,6 +3629,7 @@ void del_cart(char *name){
             }
         }
     }
+    fclose(file);
     if(j){
         system("cls");
         drawBorder();
@@ -3680,7 +3647,8 @@ void del_cart(char *name){
         printf("若输入数量大于购物车中数量,会将该商品全部删除!");
         scanf("%d",&del_count);
         if(comm.cart_count>del_count)
-        {
+        {   FILE *file=fopen(name,"ab+");
+            FILE *file_cart_del=fopen("name_cop","ab+");
             comm.cart_count-=del_count;
             rewind(file);
             rewind(file_cart_del);
@@ -3702,10 +3670,11 @@ void del_cart(char *name){
             fclose(file);
             fclose(file_cart_del);
             remove(name);
-            rename("name_cop.dat",name);
+            rename("name_cop",name);
         }
         else if(comm.cart_count<=del_count)
-        {
+        {    FILE *file=fopen(name,"ab+");
+             FILE *file_cart_del=fopen("name_cop","ab+");
             rewind(file);
             rewind(file_cart_del);
             while(!feof(file))
@@ -3722,7 +3691,7 @@ void del_cart(char *name){
             fclose(file);
             fclose(file_cart_del);
             remove(name);
-            rename("name_cop.dat",name);
+            rename("name_cop",name);
         }
         system("cls");
         drawBorder();
@@ -3916,4 +3885,56 @@ void file_down(char *name,int num){
                 break;
         }
     }
+}
+void file_in_choose(char *name){
+    int state = 0;
+    system("cls");
+    drawBorder();
+    goToXY(26,9);
+    printf("请选择操作：");
+    goToXY(26,12);
+    printf("①  ★  查看当前文件夹文件");
+    goToXY(26,14);
+    printf("②      输入文件名导入");
+    updown_bottom();
+    while(TRUE){
+        char choice;
+        choice = getch();
+        if(choice == 72){
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state -= 1;
+            if(state == -1){
+                state = 2;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+        }
+        else if(choice == 80){
+
+            goToXY(30,12+state*2);
+            printf("\b  ");
+            state += 1;
+            if(state == 2){
+                state = 0;
+            }
+            goToXY(30,12+state*2);
+            printf("★");
+
+        }else if(choice == '\r'){
+            switch(state){
+                case 0:
+                    file_now(name);
+                    break;
+                case 1:
+                    in_file(name);
+                    break;
+            }
+        }else if(choice == 27){
+            system("cls");
+            drawBorder();
+            file_oi(name);
+        }
+    }
+    getchar();
 }
